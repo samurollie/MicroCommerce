@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-
 public class WebSecurityConfig {
 
     UserDetailsServiceImpl userDetailsService;
@@ -84,13 +83,19 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers(
+                                "/api/auth/**",
+                                "/api/test/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/v2/api-docs/**",
                                 "/api-docs/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/swagger-resources/**",
+                                "/configuration/ui",
+                                "/configuration/security"
                         ).permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/services/**").hasRole("SERVICE")
                         .anyRequest().authenticated()
                 );
