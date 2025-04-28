@@ -1,5 +1,6 @@
 package com.microcommerce.catalogue.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class SellerModel {
     @Length(max = 30)
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<ProductModel> products;
 }

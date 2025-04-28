@@ -9,6 +9,7 @@ public class ProductDTO {
     private String description;
     private float price;
     private int quantity;
+    private float rating;
     private ProductType type = ProductType.OTHER;
     private Long sellerId;
 }

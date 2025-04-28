@@ -1,5 +1,6 @@
 package com.microcommerce.catalogue.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -50,7 +51,9 @@ public class ProductModel {
     @Enumerated(EnumType.STRING)
     private ProductType type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    @JsonBackReference
     private SellerModel seller;
 
     @CreationTimestamp
