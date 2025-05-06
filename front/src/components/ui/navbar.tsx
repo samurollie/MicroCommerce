@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, HStack, Link } from "@chakra-ui/react";
 import NavOption, { NavOptionProps } from "./navoption";
 import { getAvailableRoutes } from "@/utils/navigation";
