@@ -33,7 +33,9 @@ export default function RootLayout({
           <LightMode>
             <VStack h={"100vh"} w={"100vw"} bgColor={"white"} align={"start"}>
               <NavBar />
-              <VStack p={8} w="full" h="full">{children}</VStack>
+              <VStack p={8} w="full" h="full" align={"flex-start"} overflow={"scroll"}>
+                {children}
+              </VStack>
             </VStack>
           </LightMode>
         </Provider>
