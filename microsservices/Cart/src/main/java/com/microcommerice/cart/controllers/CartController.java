@@ -43,7 +43,7 @@ public class CartController {
     public ResponseEntity<CartDto> updateItemQuantity(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String productId,
-            @RequestParam int quantity) { // Or receive quantity in request body
+            @RequestParam int quantity) {
         String userId = getUserId(jwt);
         CartDto updatedCart = cartService.updateItemQuantity(userId, productId, quantity);
         return ResponseEntity.ok(updatedCart);

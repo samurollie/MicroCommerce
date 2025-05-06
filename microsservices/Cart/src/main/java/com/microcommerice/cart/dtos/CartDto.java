@@ -8,13 +8,13 @@ import java.util.UUID;
 @Data
 public class CartDto {
 
-    private UUID id;
+    private Long id;
     private String userId;
     private List<CartItemDTO> items;
 
     @Data
     public static class CartItemDTO {
-        private UUID id;
+        private Long id;
         private String productId;
         private int quantity;
         // to add product details fetched from catalogue service
