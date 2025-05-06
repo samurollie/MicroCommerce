@@ -2,12 +2,11 @@ package com.microcommerice.cart.services;
 
 import com.microcommerice.cart.dtos.AddItemRequest;
 import com.microcommerice.cart.dtos.CartDto;
+import com.microcommerice.cart.exceptions.ItemNotFoundException;
 import com.microcommerice.cart.models.Cart;
 import com.microcommerice.cart.models.CartItem;
-import com.microcommerice.cart.repositories.CartItemRepository;
 import com.microcommerice.cart.repositories.CartRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,62 +14,52 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor // Lombok annotation for constructor injection
-@Transactional // All public methods will be transactional by default
+@RequiredArgsConstructor
+@Transactional
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
-    // Inject WebClient or RestTemplate here if you need to call the catalogue service
 
     public CartDto getCartByUserId(String userId) {
         Cart cart = findOrCreateCartByUserId(userId);
+
+        if (cart.getItems().isEmpty()) {
+            throw new ItemNotFoundException("Cart is empty");
+        }
+
         return mapCartToDTO(cart);
     }
 
     public CartDto addItemToCart(String userId, AddItemRequest itemRequest) {
         Cart cart = findOrCreateCartByUserId(userId);
+        Long productId = Long.valueOf(itemRequest.getProductId());
 
-        // Check if item already exists in cart
-        Optional<CartItem> existingItemOpt = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(itemRequest.getProductId()))
-                .findFirst();
+        Optional<CartItem> existingItemOpt = findCartItemByProductId(cart, productId);
 
         if (existingItemOpt.isPresent()) {
-            // Update quantity
             CartItem existingItem = existingItemOpt.get();
             existingItem.setQuantity(existingItem.getQuantity() + itemRequest.getQuantity());
-            cartItemRepository.save(existingItem); // Explicit save might be needed depending on cascading/fetch types
         } else {
-            // Add new item
-            // TODO: Optionally validate productId and fetch price from Catalogue Service here
-            CartItem newItem = new CartItem();
-            newItem.setProductId(Long.valueOf(itemRequest.getProductId()));
-            newItem.setQuantity(itemRequest.getQuantity());
-            // newItem.setPrice(fetchedPrice); // If fetching price
-            cart.addItem(newItem); // This also sets the cart relationship
-            // cartRepository.save(cart); // Saving cart cascades to new item
+            CartItem newItem = createCartItem(productId, itemRequest.getQuantity());
+            cart.addItem(newItem);
         }
-        // Need to save the cart explicitly IF CartItem relationship is not managed by JPA correctly on add
+
         Cart savedCart = cartRepository.save(cart);
         return mapCartToDTO(savedCart);
     }
 
     public CartDto removeItemFromCart(String userId, String productId) {
-        Cart cart = findOrCreateCartByUserId(userId); // Or throw exception if cart must exist
+        Cart cart = findOrCreateCartByUserId(userId);
+        Long productIdLong = Long.valueOf(productId);
 
-        Optional<CartItem> itemToRemoveOpt = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(productId))
-                .findFirst();
+        Optional<CartItem> itemToRemoveOpt = findCartItemByProductId(cart, productIdLong);
 
         if (itemToRemoveOpt.isPresent()) {
             CartItem itemToRemove = itemToRemoveOpt.get();
-            cart.removeItem(itemToRemove); // Removes item from list and sets item.cart to null
-            // cartItemRepository.delete(itemToRemove); // Deletion happens via orphanRemoval=true or explicit call
-            cartRepository.save(cart); // Save cart to persist removal
+            cart.removeItem(itemToRemove);
+            cartRepository.save(cart);
         } else {
-            // Optionally throw an exception if item not found
-            System.out.println("Item not found in cart: " + productId);
+            throw new ItemNotFoundException("Item not found in cart");
         }
 
         return mapCartToDTO(cart);
@@ -82,39 +71,47 @@ public class CartService {
         }
 
         Cart cart = findOrCreateCartByUserId(userId);
+        Long productIdLong = Long.valueOf(productId);
 
-        Optional<CartItem> itemToUpdateOpt = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(productId))
-                .findFirst();
+        Optional<CartItem> itemToUpdateOpt = findCartItemByProductId(cart, productIdLong);
 
         if (itemToUpdateOpt.isPresent()) {
             CartItem itemToUpdate = itemToUpdateOpt.get();
             itemToUpdate.setQuantity(quantity);
-            cartItemRepository.save(itemToUpdate); // Save the updated item
         } else {
-            // Optionally throw an exception if item not found
-            System.out.println("Item not found in cart for update: " + productId);
-            // Or potentially add it as a new item? Depends on desired logic.
+            CartItem newItem = createCartItem(productIdLong, quantity);
+            cart.addItem(newItem);
         }
 
-        // Fetch the potentially modified cart again before mapping
-        Cart updatedCart = cartRepository.findById(cart.getId()).orElse(cart); // Re-fetch or trust the in-memory state
+        Cart updatedCart = cartRepository.save(cart);
         return mapCartToDTO(updatedCart);
     }
-
 
     public void deleteCart(String userId) {
         cartRepository.findByUserId(Long.valueOf(userId)).ifPresent(cartRepository::delete);
     }
 
-
     private Cart findOrCreateCartByUserId(String userId) {
-        return cartRepository.findByUserId(Long.valueOf(userId))
+        Long userIdLong = Long.valueOf(userId);
+        return cartRepository.findByUserId(userIdLong)
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
-                    newCart.setUserId(Long.valueOf(userId));
+                    newCart.setUserId(userIdLong);
                     return cartRepository.save(newCart);
                 });
+    }
+
+    private Optional<CartItem> findCartItemByProductId(Cart cart, Long productId) {
+        return cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
+    }
+
+    private CartItem createCartItem(Long productId, int quantity) {
+        CartItem newItem = new CartItem();
+        newItem.setProductId(productId);
+        newItem.setQuantity(quantity);
+        return newItem;
     }
 
     private CartDto mapCartToDTO(Cart cart) {
@@ -124,9 +121,6 @@ public class CartService {
         dto.setItems(cart.getItems().stream()
                 .map(this::mapCartItemToDTO)
                 .collect(Collectors.toList()));
-        // TODO: Here you could potentially enrich the DTOs
-        // with data fetched from the catalogue service (product name, current price, image url etc.)
-        // based on the productIds in the items.
         return dto;
     }
 
