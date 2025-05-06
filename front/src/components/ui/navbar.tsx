@@ -9,7 +9,7 @@ export default function NavBar() {
     <HStack
       w="full"
       h="65px"
-      bgColor={"purple"}
+      bgColor={"#2c2d97"}
       borderBottomColor={"black"}
       justify={"space-between"}
       padding={4}
