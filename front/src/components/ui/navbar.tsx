@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, HStack, Link } from "@chakra-ui/react";
 import NavOption, { NavOptionProps } from "./navoption";
 import { getAvailableRoutes } from "@/utils/navigation";
@@ -9,7 +11,7 @@ export default function NavBar() {
     <HStack
       w="full"
       h="65px"
-      bgColor={"purple"}
+      bgColor={"#2c2d97"}
       borderBottomColor={"black"}
       justify={"space-between"}
       padding={4}

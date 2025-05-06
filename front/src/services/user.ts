@@ -1,7 +1,12 @@
-import { UserRoles, User } from "@/models/user";
+import { User, UserRoles } from "@/models/user";
+import { UserStore } from "@/stores/user";
 
 export const userService = () => {
-  const getCurrentUser = (): User => {
+  const { user, setUser } = UserStore();
+
+  const getCurrentUser = (): User | undefined => {
+    // QUando integrar com o login, colocar para retornar user;
+    // return user;
     return {
       id: 1,
       name: "John Doe",
@@ -14,5 +19,9 @@ export const userService = () => {
     };
   };
 
-  return { getCurrentUser };
+  const setCurrentUser = (user: User) => {
+    setUser(user);
+  };
+
+  return { getCurrentUser, setCurrentUser };
 };

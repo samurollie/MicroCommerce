@@ -1,0 +1,87 @@
+spring:
+  application:
+    name: gateway
+  datasource:
+    url: jdbc:postgresql://${POSTGRESDB_URL}:${POSTGRESDB_LOCAL_PORT}/${POSTGRESDB_DATABASE}
+    username: ${POSTGRESDB_USER}
+    password: ${POSTGRESDB_ROOT_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: payment
+            uri: http://localhost:8081
+            predicates:
+              - Path=/api/payment/**
+            filters:
+              - name: featureEnabled
+                args:
+                  feature: payment
+          - id: shipping
+            uri: http://localhost:8082
+            predicates:
+              - Path=/api/shipping/**
+            filters:
+              - name: featureEnabled
+                args:
+                  feature: shipping
+          - id: orders
+            uri: http://localhost:8083
+            predicates:
+              - Path=/api/orders/**
+            filters:
+              - name: featureEnabled
+                args:
+                  feature: orders
+          - id: catalogue
+            uri: http://localhost:8084
+            predicates:
+              - Path=/api/catalogue/**
+            filters:
+              - name: featureEnabled
+                args:
+                  feature: catalogue
+          - id: cart
+            uri: http://localhost:8085
+            predicates:
+              - Path=/api/cart/**
+            filters:
+              - name: featureEnabled
+                args:
+                  feature: cart
+          - id: auth
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/auth/**
+          - id: recommendation
+            uri: http://localhost:8087
+            predicates:
+              - Path=/api/recommendation/**
+            filters:
+              - name: featureEnabled
+                args:
+                  feature: recommendation
+  web:
+    resources:
+      add-mappings: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    httptrace:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: DEBUG
