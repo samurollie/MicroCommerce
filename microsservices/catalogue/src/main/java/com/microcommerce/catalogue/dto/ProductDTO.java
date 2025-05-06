@@ -11,5 +11,5 @@ public class ProductDTO {
     private int quantity;
     private float rating;
     private ProductType type = ProductType.OTHER;
-    private Long sellerId;
+    private String seller;
 }

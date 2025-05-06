@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -48,19 +49,22 @@ public class ProductModel {
     private float rating;
 
     @NotNull
+    private String seller;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     private ProductType type;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
-    @JsonBackReference
-    private SellerModel seller;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
