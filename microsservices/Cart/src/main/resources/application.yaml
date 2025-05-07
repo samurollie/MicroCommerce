@@ -40,10 +40,12 @@ spring:
 #     fetch-registry: true
 
 # --- Configura��o para chamadas ao catalogue-service ---
-microcommerce:
-  services:
-    catalogue:
-      base-url: http://localhost:8084
+services:
+  customers:
+    url: ${AUTH_SERVICE_URL:http://localhost:8086}
+  catalogue:
+      url: ${CATALOGUE_SERVICE_URL:http://localhost:8084}
+
 
 logging:
   level:
