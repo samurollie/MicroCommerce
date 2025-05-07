@@ -5,6 +5,7 @@ import { Provider } from "@/components/ui/provider";
 import { VStack } from "@chakra-ui/react";
 import NavBar from "@/components/ui/navbar";
 import { LightMode } from "@/components/ui/color-mode";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,14 @@ export default function RootLayout({
           <LightMode>
             <VStack h={"100vh"} w={"100vw"} bgColor={"white"} align={"start"}>
               <NavBar />
-              <VStack p={8} w="full" h="full" align={"flex-start"} overflow={"scroll"}>
+              <VStack
+                p={8}
+                w="full"
+                h="full"
+                align={"flex-start"}
+                overflow={"scroll"}
+              >
+                <Toaster />
                 {children}
               </VStack>
             </VStack>

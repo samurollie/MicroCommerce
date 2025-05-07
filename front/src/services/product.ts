@@ -7,6 +7,7 @@ import { useCallback, useEffect } from "react";
 export const CatalogueService = () => {
   const products = ProductStore((state) => state.products);
   const setProducts = ProductStore((state) => state.setProducts);
+  const removeProduct = ProductStore((state) => state.removeProduct);
 
   const getProducts = useCallback(async () => {
     const existingProducts = await fetchProducts();
@@ -21,11 +22,18 @@ export const CatalogueService = () => {
     return response.json();
   };
 
+  const removeProducts = useCallback(
+    async (productId: number, quantity: number = 1) => {
+      removeProduct(productId, quantity);
+    },
+    [removeProduct]
+  );
+
   useEffect(() => {
     if (products.length === 0) {
       getProducts();
     }
   }, [products.length, getProducts]);
 
-  return { products, getProducts };
+  return { products, getProducts, removeProducts };
 };

@@ -4,7 +4,7 @@ import { create } from "zustand";
 export type ProductStore = {
   products: Product[];
   setProducts: (products: Product[]) => void;
-  removeProduct: (productId: number) => void;
+  removeProduct: (productId: number, quantity: number) => void;
   addProduct: (product: Product) => void;
   updateProduct: (productId: number, updatedProduct: Product) => void;
 };
@@ -12,13 +12,15 @@ export type ProductStore = {
 export const ProductStore = create<ProductStore>()((set) => ({
   products: [],
   setProducts: (products: Product[]) => set({ products: products }),
-  removeProduct: (productId: number) =>
+  removeProduct: (productId: number, quantity: number = 1) =>
     set((state) => {
       const product = state.products.find((p) => p.id === productId);
-      if (product && product.quantity > 1) {
+      if (product && product.quantity - quantity > 0) {
         return {
           products: state.products.map((p) =>
-            p.id === productId ? { ...p, quantity: (p.quantity || 0) - 1 } : p
+            p.id === productId
+              ? { ...p, quantity: (p.quantity || 0) - quantity }
+              : p
           ),
         };
       }

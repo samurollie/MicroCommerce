@@ -1,5 +1,7 @@
 "use client";
 
+import { toaster } from "@/components/ui/toaster";
+import { CartService } from "@/services/cart";
 import { CatalogueService } from "@/services/product";
 import {
   Breadcrumb,
@@ -18,16 +20,27 @@ import { useState } from "react";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
 export default function ProductDetails({ id }: { id: number }) {
-  const { products } = CatalogueService();
+  const { products, removeProducts } = CatalogueService();
+  const { addToCart } = CartService();
   const product = products.find((product) => product.id === Number(id));
-  const [value, setValue] = useState("0");
-
-  const handleAddToCart = () => {
-  };
+  const [quantity, setValue] = useState("0");
 
   if (!product) {
     return <div>Product not found</div>;
   }
+
+  const handleAddToCart = () => {
+    if (quantity === "0") {
+      return;
+    }
+    removeProducts(product.id, Number(quantity));
+    addToCart(product, Number(quantity));
+    toaster.create({
+      title: "Produto adicionado ao carrinho",
+      type: "success",
+      duration: 10000
+    });
+  };
 
   return (
     <>
@@ -86,7 +99,7 @@ export default function ProductDetails({ id }: { id: number }) {
           </Card.Header>
           <Card.Body marginTop={16}>
             <NumberInput.Root
-              value={value}
+              value={quantity}
               onValueChange={(e) => setValue(e.value)}
               unstyled
               spinOnPress={false}
@@ -118,7 +131,7 @@ export default function ProductDetails({ id }: { id: number }) {
             <Text fontSize={"md"} fontWeight={"bold"} mt={6}>
               Total:{" "}
               <FormatNumber
-                value={Number(product.price) * Number(value)}
+                value={Number(product.price) * Number(quantity)}
                 style="currency"
                 currency="BRL"
               />

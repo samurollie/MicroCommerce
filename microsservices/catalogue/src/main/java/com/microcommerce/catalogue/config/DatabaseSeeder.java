@@ -32,6 +32,7 @@ public class DatabaseSeeder {
                         product.setRating(Math.round(random.nextFloat() * 50) / 10.0f);
                         product.setSeller(sellerName);
                         product.setType(type);
+                        product.setQuantity(10);
 
                         products.add(product);
                     }
