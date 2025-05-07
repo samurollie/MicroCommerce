@@ -7,8 +7,8 @@ services:
       - "8086:8086"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer_db
-      SPRING_DATASOURCE_USERNAME: micro
-      SPRING_DATASOURCE_PASSWORD: commerce
+      SPRING_DATASOURCE_USERNAME: customer
+      SPRING_DATASOURCE_PASSWORD: customer
     depends_on:
       - db
 
