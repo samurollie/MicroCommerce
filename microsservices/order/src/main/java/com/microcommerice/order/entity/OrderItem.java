@@ -28,14 +28,17 @@ public class OrderItem {
     @Column(name = "product_id", nullable = false)
     private String productId;
 
+    @Column(name = "product_name_snapshot") // Snapshot do nome do produto
+    private String productNameSnapshot;
+
     @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false, precision = 19, scale = 4)
+    @Column(name = "price_at_purchase", nullable = false, precision = 19, scale = 4)
     private BigDecimal priceAtPurchase;
 
     @Column(nullable = false, precision = 19, scale = 4)
-    private BigDecimal subtotal;
+    private BigDecimal subtotal; // quantity * priceAtPurchase
 
     public void calculateSubtotal() {
         if (this.priceAtPurchase != null && this.quantity > 0) {
@@ -49,5 +52,10 @@ public class OrderItem {
         if (this.id == null) {
             this.id = UUID.randomUUID();
         }
+        calculateSubtotal();
+    }
+    @PreUpdate
+    protected void onUpdate(){
+        calculateSubtotal();
     }
 }

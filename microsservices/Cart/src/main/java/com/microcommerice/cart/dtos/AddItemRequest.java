@@ -4,12 +4,16 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class AddItemRequest {
 
-    @NotBlank(message = "Product ID is required")
-    private String productId;
+    private Long productId;
 
-    @Min(value = 1, message = "Quantity must be at least 1")
-    private int quantity;
+    @Min(value = 1, message = "Quantity must be greater than zero")
+    private Integer quantity;
+    private String productName;
+    private BigDecimal unitPrice;
+    private String imageUrl;
 }

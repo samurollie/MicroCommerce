@@ -1,66 +1,76 @@
 package com.microcommerice.cart.controllers;
 
 import com.microcommerice.cart.dtos.AddItemRequest;
-import com.microcommerice.cart.dtos.CartDto;
+import com.microcommerice.cart.dtos.CartResponse;
+import com.microcommerice.cart.dtos.UpdateQuantityRequest;
 import com.microcommerice.cart.services.CartService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/cart")
+@RequestMapping("/api/cart")
 @RequiredArgsConstructor
 public class CartController {
 
     private final CartService cartService;
 
-
-    // Helper method to extract user ID (subject) from JWT
-    private String getUserId(Jwt jwt) {
-        // Adjust "sub" if your customer service uses a different claim for the user ID
-        return jwt.getSubject();
-    }
-
     @GetMapping
-    public ResponseEntity<CartDto> getMyCart(@AuthenticationPrincipal Jwt jwt) {
-        String userId = getUserId(jwt);
-        CartDto cart = cartService.getCartByUserId(userId);
-        return ResponseEntity.ok(cart);
+    public ResponseEntity<CartResponse> getCart() {
+        String userId = getCurrentUserId();
+        return ResponseEntity.ok(cartService.getCart(userId));
     }
 
     @PostMapping("/items")
-    public ResponseEntity<CartDto> addItem(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AddItemRequest addItemRequest) {
-        String userId = getUserId(jwt);
-        CartDto updatedCart = cartService.addItemToCart(userId, addItemRequest);
-        return ResponseEntity.ok(updatedCart);
+    public ResponseEntity<CartResponse> addItem(@RequestBody AddItemRequest request) {
+        String userId = getCurrentUserId();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(cartService.addItem(userId, request));
     }
 
-    @PutMapping("/items/{productId}")
-    public ResponseEntity<CartDto> updateItemQuantity(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable String productId,
-            @RequestParam int quantity) {
-        String userId = getUserId(jwt);
-        CartDto updatedCart = cartService.updateItemQuantity(userId, productId, quantity);
-        return ResponseEntity.ok(updatedCart);
+    @PutMapping("/items")
+    public ResponseEntity<CartResponse> updateItemQuantity(@RequestBody UpdateQuantityRequest request) {
+        String userId = getCurrentUserId();
+        return ResponseEntity.ok(cartService.updateItemQuantity(userId, request));
     }
 
-    @DeleteMapping("/items/{productId}")
-    public ResponseEntity<CartDto> removeItem(@AuthenticationPrincipal Jwt jwt, @PathVariable String productId) {
-        String userId = getUserId(jwt);
-        CartDto updatedCart = cartService.removeItemFromCart(userId, productId);
-        return ResponseEntity.ok(updatedCart);
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity<CartResponse> removeItem(@PathVariable Long itemId) {
+        String userId = getCurrentUserId();
+        return ResponseEntity.ok(cartService.removeItem(userId, itemId));
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMyCart(@AuthenticationPrincipal Jwt jwt) {
-        String userId = getUserId(jwt);
-        cartService.deleteCart(userId);
+    public ResponseEntity<Void> clearCart() {
+        String userId = getCurrentUserId();
+        cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/checkout")
+    public ResponseEntity<CartResponse> checkout() {
+        String userId = getCurrentUserId();
+        return ResponseEntity.ok(cartService.checkout(userId));
+    }
+
+    /**
+     * Extract the user ID from the JWT token in the security context
+     * @return the user ID from the JWT token
+     */
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new SecurityException("No authentication found");
+        }
+
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            return jwt.getSubject(); // Assuming the subject is the user ID
+        }
+
+        return authentication.getName(); // Fallback to authentication name
+    }
 }
