@@ -1,6 +1,6 @@
 package com.microcommerice.cart.config;
 
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,7 +12,7 @@ public class WebClientConfig {
     private String catalogueServiceBaseUrl;
 
     @Bean
-    // @LoadBalanced // Remova ou comente se NÃO estiver usando service discovery e 'lb://' URIs
+    // @LoadBalanced
     public WebClient.Builder loadBalancedWebClientBuilder() {
         return WebClient.builder();
     }

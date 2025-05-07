@@ -1,12 +1,15 @@
 package com.microcommerice.cart.services.impl;
 
 import com.microcommerice.cart.client.CatalogueClient;
+import com.microcommerice.cart.client.CustomerClient;
 import com.microcommerice.cart.client.OrderClient;
 import com.microcommerice.cart.dtos.AddItemRequest;
+import com.microcommerice.cart.dtos.AddressDto;
 import com.microcommerice.cart.dtos.CartResponse;
 import com.microcommerice.cart.dtos.UpdateQuantityRequest;
 import com.microcommerice.cart.exceptions.CartItemNotFoundException;
 import com.microcommerice.cart.exceptions.CartNotFoundException;
+import com.microcommerice.cart.exceptions.CheckoutException;
 import com.microcommerice.cart.mapper.CartMapper;
 import com.microcommerice.cart.models.Cart;
 import com.microcommerice.cart.models.CartItem;
@@ -16,7 +19,11 @@ import com.microcommerice.cart.services.CartService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +35,7 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
     private final CatalogueClient catalogueClient;
     private final OrderClient orderClient;
-
+    private final CustomerClient customerClient;
 
 
     @Override
@@ -129,6 +136,15 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
+    private Cart findOrCreateCart(String userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUserId(userId);
+                    return cartRepository.save(newCart);
+                });
+    }
+
     @Override
     @Transactional
     public CartResponse checkout(String userId) {
@@ -139,23 +155,31 @@ public class CartServiceImpl implements CartService {
             throw new CartNotFoundException("Cannot checkout an empty cart");
         }
 
-        // Create order request from cart
-        // This would call the Order service to create an order
-        // For now, we'll just simulate the checkout process
+        // Get the authentication token from the security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String token = null;
+        if (authentication != null && authentication.getCredentials() instanceof String) {
+            token = (String) authentication.getCredentials();
+        }
 
-        // Clear the cart after successful checkout
+        if (token == null) {
+            throw new SecurityException("Authentication token not available");
+        }
+
+        // Get user's default shipping address
+        List<AddressDto> addresses = customerClient.getUserAddresses("Bearer " + token);
+        AddressDto shippingAddress = addresses.stream()
+                .filter(AddressDto::isDefault)
+                .findFirst()
+                .orElseThrow(() -> new CheckoutException("No default shipping address found"));
+
+        // Create order request from cart and shipping address
+        // ...rest of checkout code...
+
         CartResponse cartResponse = cartMapper.toCartResponse(cart);
         clearCart(userId);
 
         return cartResponse;
-    }
 
-    private Cart findOrCreateCart(String userId) {
-        return cartRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    Cart newCart = new Cart();
-                    newCart.setUserId(userId);
-                    return cartRepository.save(newCart);
-                });
     }
 }
