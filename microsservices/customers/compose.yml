@@ -6,9 +6,9 @@ services:
     ports:
       - "8086:8086"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer_db
-      SPRING_DATASOURCE_USERNAME: customer
-      SPRING_DATASOURCE_PASSWORD: customer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5438/customer_db
+      SPRING_DATASOURCE_USERNAME: micro
+      SPRING_DATASOURCE_PASSWORD: commerce
     depends_on:
       - db
 
@@ -18,8 +18,9 @@ services:
       POSTGRES_DB: customer_db
       POSTGRES_USER: micro
       POSTGRES_PASSWORD: commerce
+      PGPORT: 5438
     ports:
-      - "5432:5432"
+      - "5438:5438"
     volumes:
       - pgdata:/var/lib/postgresql/data
 

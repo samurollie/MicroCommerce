@@ -36,8 +36,10 @@ public class Customer {
     private String email;
 
     @NotBlank
-    @Size(max = 100)
-    private String name;
+    private String firstName;
+
+    @NotBlank
+    private String lastName;
 
     @Size(max = 20)
     private String phone;
@@ -51,10 +53,12 @@ public class Customer {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public Customer(String username, String email, String password, String name) {
+    public Customer(String username, String password, String email, String firstName, String lastName, String phone) {
         this.username = username;
-        this.email = email;
         this.password = password;
-        this.name = name;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
     }
 }

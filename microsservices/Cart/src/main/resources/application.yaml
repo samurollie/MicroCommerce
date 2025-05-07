@@ -5,7 +5,7 @@ spring:
   application:
     name: cart-service
 
-  # --- Configuração do Banco de Dados (PostgreSQL) ---
+  # --- Configuraï¿½ï¿½o do Banco de Dados (PostgreSQL) ---
   datasource:
     url: jdbc:postgresql://localhost:5432/cart_db
     username: cart
@@ -20,32 +20,37 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-  # --- Configuração de Segurança (OAuth2 Resource Server - JWT) ---
+  # --- Configuraï¿½ï¿½o de Seguranï¿½a (OAuth2 Resource Server - JWT) ---
   security:
     oauth2:
       resourceserver:
+        # Aponta para 'customers-service' (auth) que esta na porta 8086
         jwt:
-          # Aponta para 'customers-service' (auth) que está na porta 8086
-          issuer-uri: http://localhost:8086/realms/your-realm
+          issuer-uri: ${AUTH_SERVICE_URL:http://localhost:8086}/api/auth
+          jwk-set-uri: ${AUTH_SERVICE_URL:http://localhost:8086}/api/auth/certs
 
 # --- Service Discovery (Exemplo com Eureka) ---
-# Se você estiver usando Eureka e o gateway também, descomente e configure.
-# Caso contrário, as URLs diretas abaixo serão usadas.
+# Se vocï¿½ estiver usando Eureka e o gateway tambï¿½m, descomente e configure.
+# Caso contrï¿½rio, as URLs diretas abaixo serï¿½o usadas.
 # eureka:
 #   client:
 #     serviceUrl:
-#       defaultZone: http://localhost:8761/eureka/ # Endereço do seu Eureka server
+#       defaultZone: http://localhost:8761/eureka/ # Endereï¿½o do seu Eureka server
 #     register-with-eureka: true
 #     fetch-registry: true
 
-# --- Configuração para chamadas ao catalogue-service ---
-microcommerce:
-  services:
-    catalogue:
-      base-url: http://localhost:8084
+# --- Configuraï¿½ï¿½o para chamadas ao catalogue-service ---
+services:
+  customers:
+    url: ${AUTH_SERVICE_URL:http://localhost:8086}
+  catalogue:
+      url: ${CATALOGUE_SERVICE_URL:http://localhost:8084}
+
+
 logging:
   level:
     org.springframework.security: DEBUG
     com.microcommerce.cart: DEBUG
     org.springframework.web.client.RestTemplate: DEBUG
-    reactor.netty.http.client: DEBUG # Para WebClient
+    com.microcommerce.cart.client.CatalogueClient: DEBUG
+    com.microcommerce.cart.client.CustomerClient: DEBUG
