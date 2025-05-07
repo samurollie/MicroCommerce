@@ -1,0 +1,69 @@
+networks:
+  microservices-network:
+    driver: bridge
+
+services:
+  gateway:
+    build: api/gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://gateway_db:5432/gateway_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+      CATALOGUE_URL: http://catalogue:8084
+    depends_on:
+      - gateway_db
+      - catalogue
+    networks:
+      - microservices-network
+
+  gateway_db:
+    image: postgres:15
+    container_name: gateway_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=gateway_db
+    ports:
+      - 5432:5432
+    volumes:
+      - gateway_db:/var/lib/postgres
+    networks:
+      - microservices-network
+
+  catalogue:
+    build: microsservices/catalogue
+    container_name: catalogue
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://catalogue_db:5433/catalogue_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - catalogue_db
+    networks:
+      - microservices-network
+
+  catalogue_db:
+    image: postgres:15
+    container_name: catalogue_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=catalogue_db
+      - PGPORT=5433
+    ports:
+      - "5433:5433"
+    volumes:
+      - catalogue_db:/var/lib/postgres
+    networks:
+      - microservices-network
+
+volumes:
+  gateway_db:
+  catalogue_db:

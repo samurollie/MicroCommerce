@@ -40,7 +40,7 @@ spring:
                 args:
                   feature: orders
           - id: catalogue
-            uri: http://localhost:8084
+            uri: ${CATALOGUE_URL:http://localhost:8084}
             predicates:
               - Path=/api/catalogue/**
             filters:
