@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "cart_items")
@@ -15,34 +16,24 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CartItem {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    @Column(name = "product_id", nullable = false)
     private Long productId;
 
-    @Column(nullable = false)
-    private int quantity;
+    private String productName;
 
-    @Column(nullable = false)
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    private Integer quantity;
 
-        CartItem cartItem = (CartItem) o;
+    private String imageUrl;
 
-        return id != null ? id.equals(cartItem.id) : cartItem.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    public BigDecimal getSubtotal() {
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 }
