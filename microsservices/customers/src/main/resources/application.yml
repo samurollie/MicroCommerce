@@ -20,5 +20,5 @@ jwt:
     expiration: 3600 # in seconds
 
 server:
-    port: 8081
+    port: 8086
 
