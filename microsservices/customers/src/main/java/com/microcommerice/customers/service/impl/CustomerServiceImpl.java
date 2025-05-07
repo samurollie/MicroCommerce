@@ -23,47 +23,47 @@ import java.util.stream.Collectors;
 public class CustomerServiceImpl implements CustomerService {
 
 
-    private final CustomerRepository userRepository;
+    private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDto getCurrentUser(Authentication authentication) {
-        Customer user = getUserFromAuthentication(authentication);
+    public UserDto getCurrentCustomer(Authentication authentication) {
+        Customer user = getCustomerFromAuthentication(authentication);
         return mapUserToDto(user);
     }
 
     @Override
     @Transactional
-    public UserDto updateUser(Authentication authentication, UpdateCustomerRequest updateRequest) {
-        Customer user = getUserFromAuthentication(authentication);
+    public UserDto updateCustomer(Authentication authentication, UpdateCustomerRequest updateRequest) {
+        Customer customer = getCustomerFromAuthentication(authentication);
 
         if (updateRequest.getFirstName() != null) {
-            user.setFirstName(updateRequest.getFirstName());
+            customer.setFirstName(updateRequest.getFirstName());
         }
 
         if (updateRequest.getLastName() != null) {
-            user.setLastName(updateRequest.getLastName());
+            customer.setLastName(updateRequest.getLastName());
         }
 
         if (updateRequest.getEmail() != null &&
-                !updateRequest.getEmail().equals(user.getEmail()) &&
-                userRepository.existsByEmail(updateRequest.getEmail())) {
+                !updateRequest.getEmail().equals(customer.getEmail()) &&
+                customerRepository.existsByEmail(updateRequest.getEmail())) {
             throw new IllegalArgumentException("Email already in use");
         } else if (updateRequest.getEmail() != null) {
-            user.setEmail(updateRequest.getEmail());
+            customer.setEmail(updateRequest.getEmail());
         }
 
-        Customer savedUser = userRepository.save(user);
+        Customer savedUser = customerRepository.save(customer);
         return mapUserToDto(savedUser);
     }
 
     @Override
     @Transactional
     public void changePassword(Authentication authentication, ChangePasswordRequest request) {
-        Customer user = getUserFromAuthentication(authentication);
+        Customer customer = getCustomerFromAuthentication(authentication);
 
         // Validate old password
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), customer.getPassword())) {
             throw new UnauthorizedException("Current password is incorrect");
         }
 
@@ -73,49 +73,49 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         // Update password
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
+        customer.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        customerRepository.save(customer);
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
+    public List<UserDto> getAllCustomers() {
+        return customerRepository.findAll().stream()
                 .map(this::mapUserToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto getUserById(Long id) {
-        Customer user = userRepository.findById(id)
+    public UserDto getCustomerById(Long id) {
+        Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return mapUserToDto(user);
+        return mapUserToDto(customer);
     }
 
     @Override
     @Transactional
-    public void toggleUserStatus(Long id) {
-        Customer user = userRepository.findById(id)
+    public void toggleCustomerStatus(Long id) {
+        Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        user.setActive(!user.isActive());
-        userRepository.save(user);
+        customer.setActive(!customer.isActive());
+        customerRepository.save(customer);
     }
 
     @Override
-    public Customer getUserFromAuthentication(Authentication authentication) {
+    public Customer getCustomerFromAuthentication(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new UnauthorizedException("User not authenticated");
         }
 
         Object principal = authentication.getPrincipal();
-        Long userId;
+        Long customerId;
 
         if (principal instanceof UserDetailsImpl) {
-            userId = ((UserDetailsImpl) principal).getId();
+            customerId = ((UserDetailsImpl) principal).getId();
         } else {
             throw new UnauthorizedException("Invalid authentication principal");
         }
 
-        return userRepository.findById(userId)
+        return customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 

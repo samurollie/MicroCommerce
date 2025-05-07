@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final CustomerRepository userRepository;
+    private final CustomerRepository customerRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
@@ -61,32 +61,32 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (customerRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (customerRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        // Create new user's account
-        Customer user = new Customer();
-        user.setUsername(signUpRequest.getUsername());
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(encoder.encode(signUpRequest.getPassword()));
-        user.setFirstName(signUpRequest.getFirstName());
-        user.setLastName(signUpRequest.getLastName());
+        // Create new customer's account
+        Customer customer = new Customer();
+        customer.setUsername(signUpRequest.getUsername());
+        customer.setEmail(signUpRequest.getEmail());
+        customer.setPassword(encoder.encode(signUpRequest.getPassword()));
+        customer.setFirstName(signUpRequest.getFirstName());
+        customer.setLastName(signUpRequest.getLastName());
 
         Set<Role> roles = new HashSet<>();
 
         // By default, assign ROLE_USER
-        Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER)
+        Role customerRole = roleRepository.findByName(Role.ERole.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        roles.add(userRole);
+        roles.add(customerRole);
 
         // Check if admin role is requested and add it if so
         if (signUpRequest.getRoles() != null) {
@@ -99,8 +99,8 @@ public class AuthController {
             });
         }
 
-        user.setRoles(roles);
-        userRepository.save(user);
+        customer.setRoles(roles);
+        customerRepository.save(customer);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

@@ -22,44 +22,44 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerController {
 
-    private final CustomerService userService;
+    private final CustomerService customerService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
-        return ResponseEntity.ok(userService.getCurrentUser(authentication));
+        return ResponseEntity.ok(customerService.getCurrentCustomer(authentication));
     }
 
     @PutMapping("/me")
     public ResponseEntity<UserDto> updateCurrentUser(
             Authentication authentication,
             @Valid @RequestBody UpdateCustomerRequest updateRequest) {
-        return ResponseEntity.ok(userService.updateUser(authentication, updateRequest));
+        return ResponseEntity.ok(customerService.updateCustomer(authentication, updateRequest));
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(
             Authentication authentication,
             @Valid @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(authentication, request);
+        customerService.changePassword(authentication, request);
         return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+        return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+        return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> toggleUserStatus(@PathVariable Long id) {
-        userService.toggleUserStatus(id);
+        customerService.toggleCustomerStatus(id);
         return ResponseEntity.ok(new MessageResponse("User status updated successfully"));
     }
 }

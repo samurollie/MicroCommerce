@@ -8,17 +8,17 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public interface CustomerService {
-    UserDto getCurrentUser(Authentication authentication);
+    UserDto getCurrentCustomer(Authentication authentication);
 
-    UserDto updateUser(Authentication authentication, UpdateCustomerRequest updateRequest);
+    UserDto updateCustomer(Authentication authentication, UpdateCustomerRequest updateRequest);
 
     void changePassword(Authentication authentication, ChangePasswordRequest request);
 
-    List<UserDto> getAllUsers();
+    List<UserDto> getAllCustomers();
 
-    UserDto getUserById(Long id);
+    UserDto getCustomerById(Long id);
 
-    void toggleUserStatus(Long id);
+    void toggleCustomerStatus(Long id);
 
-    Customer getUserFromAuthentication(Authentication authentication);
+    Customer getCustomerFromAuthentication(Authentication authentication);
 }

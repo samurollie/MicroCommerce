@@ -26,7 +26,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDto> getUserAddresses(Authentication authentication) {
-        Customer user = userService.getUserFromAuthentication(authentication);
+        Customer user = userService.getCustomerFromAuthentication(authentication);
         return addressRepository.findByCustomer(user).stream()
                 .map(this::mapAddressToDto)
                 .collect(Collectors.toList());
@@ -35,7 +35,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressDto addAddress(Authentication authentication, AddressDto addressDto) {
-        Customer user = userService.getUserFromAuthentication(authentication);
+        Customer user = userService.getCustomerFromAuthentication(authentication);
 
         Address address = new Address();
         address.setCustomer(user);
@@ -63,7 +63,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressDto updateAddress(Authentication authentication, Long addressId, AddressDto addressDto) {
-        Customer user = userService.getUserFromAuthentication(authentication);
+        Customer user = userService.getCustomerFromAuthentication(authentication);
 
         Address address = addressRepository.findByIdAndCustomer(addressId, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
@@ -87,7 +87,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void deleteAddress(Authentication authentication, Long addressId) {
-        Customer user = userService.getUserFromAuthentication(authentication);
+        Customer user = userService.getCustomerFromAuthentication(authentication);
 
         Address address = addressRepository.findByIdAndCustomer(addressId, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
@@ -108,12 +108,12 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void setDefaultAddress(Authentication authentication, Long addressId) {
-        Customer user = userService.getUserFromAuthentication(authentication);
+        Customer customer = userService.getCustomerFromAuthentication(authentication);
 
-        Address address = addressRepository.findByIdAndCustomer(addressId, user)
+        Address address = addressRepository.findByIdAndCustomer(addressId, customer)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
 
-        resetDefaultAddress(user);
+        resetDefaultAddress(customer);
         address.setDefault(true);
         addressRepository.save(address);
     }
