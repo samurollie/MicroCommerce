@@ -1,9 +1,9 @@
 import { NavOptionProps } from "@/components/ui/navoption";
 import { UserRoles } from "@/models/user";
-import { userService } from "@/services/user";
+import { UserService } from "@/services/user";
 
 export function getAvailableRoutes(): NavOptionProps[] {
-  const { getCurrentUser } = userService();
+  const { getCurrentUser } = UserService();
   const routes: NavOptionProps[] = [];
 
   const unprotectedRoutes: NavOptionProps[] = [

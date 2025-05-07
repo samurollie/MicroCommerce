@@ -3,15 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Box,
   Button,
   Card,
-  FormControl,
-  FormLabel,
   Input,
   Text,
   VStack,
 } from "@chakra-ui/react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -65,6 +63,11 @@ export default function LoginPage() {
           <Button type="submit" bgColor="blue" width="full">
             Entrar
           </Button>
+          <Link href="/register">
+            <Text color="blue.500" textAlign="center">
+              Não tem uma conta? Crie uma!
+            </Text>
+          </Link>
         </VStack>
       </form>
     </Card.Root>
