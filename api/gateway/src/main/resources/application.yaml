@@ -56,9 +56,9 @@ spring:
                 args:
                   feature: cart
           - id: auth
-            uri: http://localhost:8086
+            uri: ${CUSTOMERS_URL:http://localhost:8086}
             predicates:
-              - Path=/api/auth/**
+              - Path=/api/auth/**, /api/customers/**, /api/service/**
           - id: recommendation
             uri: http://localhost:8087
             predicates:

@@ -13,9 +13,11 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 1234
       CATALOGUE_URL: http://catalogue:8084
+      CUSTOMERS_URL: http://costumers:8086
     depends_on:
       - gateway_db
       - catalogue
+      - customers
     networks:
       - microservices-network
 
@@ -64,6 +66,37 @@ services:
     networks:
       - microservices-network
 
+  customers:
+    build: microsservices/customers
+    container_name: costumers
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://costumers_db:5438/customer_db
+      SPRING_DATASOURCE_USERNAME: micro
+      SPRING_DATASOURCE_PASSWORD: commerce
+    depends_on:
+      - costumers_db
+    networks:
+      - microservices-network
+
+  costumers_db:
+    image: postgres:16
+    container_name: costumers_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: micro
+      POSTGRES_PASSWORD: commerce
+      PGPORT: 5438
+    ports:
+      - "5438:5438"
+    volumes:
+      - costumers_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
 volumes:
   gateway_db:
   catalogue_db:
+  costumers_db:
