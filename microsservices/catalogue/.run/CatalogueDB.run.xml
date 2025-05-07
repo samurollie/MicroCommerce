@@ -5,7 +5,7 @@
         <option name="envFilePath" value="" />
         <option name="services">
           <list>
-            <option value="postgresdb" />
+            <option value="db" />
           </list>
         </option>
         <option name="sourceFilePath" value="docker-compose.yml" />
