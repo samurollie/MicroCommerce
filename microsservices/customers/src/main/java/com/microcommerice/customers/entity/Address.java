@@ -14,45 +14,25 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Address {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
-    private String street;
-
-    @NotBlank
-    @Size(max = 20)
-    private String number;
-
-    @Size(max = 50)
-    private String complement;
-
-    @NotBlank
-    @Size(max = 50)
-    private String neighborhood;
-
-    @NotBlank
-    @Size(max = 50)
-    private String city;
-
-    @NotBlank
-    @Size(max = 2)
-    private String state;
-
-    @NotBlank
-    @Size(max = 10)
-    private String zipCode;
-
-    @NotBlank
-    @Size(max = 50)
-    private String country;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @Column(name = "is_main")
-    private boolean main;
+    private String streetAddress;
+
+    private String city;
+
+    private String state;
+
+    private String postalCode;
+
+    private String country;
+
+    @NotBlank
+    private boolean isDefault;
 }
