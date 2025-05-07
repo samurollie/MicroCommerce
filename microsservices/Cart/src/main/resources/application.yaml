@@ -52,4 +52,5 @@ logging:
     org.springframework.security: DEBUG
     com.microcommerce.cart: DEBUG
     org.springframework.web.client.RestTemplate: DEBUG
-    reactor.netty.http.client: DEBUG # Para WebClient
+    com.microcommerce.cart.client.CatalogueClient: DEBUG
+    com.microcommerce.cart.client.CustomerClient: DEBUG
