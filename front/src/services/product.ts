@@ -8,6 +8,7 @@ export const CatalogueService = () => {
   const products = ProductStore((state) => state.products);
   const setProducts = ProductStore((state) => state.setProducts);
   const removeProduct = ProductStore((state) => state.removeProduct);
+  const addProducts = ProductStore((state) => state.addProducts);
 
   const getProducts = useCallback(async () => {
     const existingProducts = await fetchProducts();
@@ -29,11 +30,23 @@ export const CatalogueService = () => {
     [removeProduct]
   );
 
+  const addProduct = useCallback(
+    async (product: Product, quantity: number = 1) => {
+      addProducts(product, quantity);
+    },
+    [addProducts]
+  );
+
+  const getProduct = useCallback(
+    (id: number) => products.find((p) => p.id === id),
+    [products]
+  );
+
   useEffect(() => {
     if (products.length === 0) {
       getProducts();
     }
   }, [products.length, getProducts]);
 
-  return { products, getProducts, removeProducts };
+  return { products, getProducts, removeProducts, addProduct, getProduct };
 };

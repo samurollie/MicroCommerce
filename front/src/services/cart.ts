@@ -20,10 +20,17 @@ export const CartService = () => {
   }, [addItem]);
 
   const addToCart = useCallback(
-    async (product: Product, quantity: number) => {
+    async (product: Product, quantity: number = 1) => {
       addItem(product, quantity);
     },
     [addItem]
+  );
+
+  const removeFromCart = useCallback(
+    async (productId: number, quantity: number = 1) => {
+      subtractItem(productId, quantity);
+    },
+    [subtractItem]
   );
 
   const fetchCart = async (): Promise<Product[]> => {
@@ -40,5 +47,5 @@ export const CartService = () => {
     }
   }, [items.length, getCart]);
 
-  return { items, total, getCart, addToCart };
+  return { items, total, getCart, addToCart, clearCart, removeFromCart };
 };

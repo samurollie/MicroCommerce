@@ -16,6 +16,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
@@ -24,6 +25,7 @@ export default function ProductDetails({ id }: { id: number }) {
   const { addToCart } = CartService();
   const product = products.find((product) => product.id === Number(id));
   const [quantity, setValue] = useState("0");
+  const router = useRouter();
 
   if (!product) {
     return <div>Product not found</div>;
@@ -38,7 +40,13 @@ export default function ProductDetails({ id }: { id: number }) {
     toaster.create({
       title: "Produto adicionado ao carrinho",
       type: "success",
-      duration: 10000
+      duration: 10000,
+      action: {
+        label: "Ver carrinho",
+        onClick: () => {
+          router.push("/cart");
+        },
+      }
     });
   };
 

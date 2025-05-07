@@ -1,13 +1,22 @@
 "use client";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { Product } from "@/models/product";
 import { CartService } from "@/services/cart";
-import { VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormatNumber,
+  HStack,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { LuShoppingCart } from "react-icons/lu";
+import CartListItem from "./CartListItem";
+import { CatalogueService } from "@/services/product";
 
 export default function CartList() {
-  const { items, total } = CartService();
+  const { items, total, clearCart } = CartService();
+  const { addProduct } = CatalogueService();
 
   if (items.length === 0) {
     return (
@@ -20,17 +29,51 @@ export default function CartList() {
       </VStack>
     );
   }
+
+  const handleClearCart = () => {
+    items.forEach((item) => {
+      addProduct(item, item.quantity);
+    });
+    clearCart();
+  };
+
   return (
-    <div>
-      <h1>Meu carrinho</h1>
-      <ul>
-        {items.map((product: Product) => (
-          <li key={product.id}>
-            {product.name} - {product.price} - {product.quantity}
-          </li>
+    <HStack w="full" align={"flex-start"} h="50%" overflow={"scroll"}>
+      <VStack w="70%" align={"flex-start"} gap={4} h="full">
+        {items.map((item) => (
+          <CartListItem key={item.id} item={item} />
         ))}
-      </ul>
-      <p>Total: {total}</p>
-    </div>
+      </VStack>
+      <VStack
+        align={"flex-start"}
+        h="full"
+        w="30%"
+        justify={"space-between"}
+        borderWidth={1}
+        borderRadius="md"
+        p={4}
+      >
+        <Box>
+          <Text>Total:</Text>
+          <Text fontSize={"xl"} fontWeight={"bold"}>
+            <FormatNumber value={total} style="currency" currency="BRL" />
+          </Text>
+        </Box>
+        <Box>
+          <Button w="full" p="4" bgColor={"#2c2d97"}>
+            Continuar para pagamento
+          </Button>
+          <Button
+            w="full"
+            mt={1}
+            p="4"
+            variant="outline"
+            onClick={handleClearCart}
+          >
+            Esvaziar carrinho
+          </Button>
+        </Box>
+      </VStack>
+    </HStack>
   );
 }

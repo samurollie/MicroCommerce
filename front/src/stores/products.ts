@@ -5,7 +5,7 @@ export type ProductStore = {
   products: Product[];
   setProducts: (products: Product[]) => void;
   removeProduct: (productId: number, quantity: number) => void;
-  addProduct: (product: Product) => void;
+  addProducts: (product: Product, quantity?: number) => void;
   updateProduct: (productId: number, updatedProduct: Product) => void;
 };
 
@@ -28,14 +28,16 @@ export const ProductStore = create<ProductStore>()((set) => ({
         products: state.products.filter((product) => product.id !== productId),
       };
     }),
-  addProduct: (product: Product) =>
+  addProducts: (product: Product, quantity: number = 1) =>
     set((state) => {
       const productId = product.id;
       const existingProduct = state.products.find((p) => p.id === productId);
       if (existingProduct) {
         return {
           products: state.products.map((p) =>
-            p.id === productId ? { ...p, quantity: (p.quantity || 0) + 1 } : p
+            p.id === productId
+              ? { ...p, quantity: (p.quantity || 0) + quantity }
+              : p
           ),
         };
       }
