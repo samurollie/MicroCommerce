@@ -24,12 +24,11 @@ public class DatabaseSeeder {
                 for (ProductType type : ProductType.values()) {
                     String sellerName = getSeller(type);
 
-                    for (int i = 1; i <= 20; i++) {
+                    for (int i = 1; i <= 10; i++) {
                         ProductModel product = new ProductModel();
                         product.setName(getProductName(type, i));
-                        product.setDescription(getDescription(type, i));
-                        product.setPrice(random.nextFloat() * 1000 + 1);
-                        product.setQuantity(random.nextInt(100) + 1);
+                        product.setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer feugiat dui non scelerisque finibus. Etiam nec lorem felis. Fusce erat orci, tincidunt sed nulla ac, porttitor fermentum nunc. In at erat ut mi pharetra congue. Integer sollicitudin odio at condimentum elementum. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nunc vehicula tincidunt purus semper euismod. Donec fermentum lobortis libero, ut auctor dolor aliquet nec. Maecenas at mollis massa, ac blandit magna. In vel feugiat nisi. Sed augue diam, efficitur eget nunc vel, sagittis sagittis orci. Morbi elementum tellus rhoncus, tincidunt sapien at, euismod lacus. Etiam volutpat sem metus, a sagittis est tincidunt id. Praesent auctor sodales mi, nec iaculis metus tincidunt vel. Pellentesque in mi eget mauris scelerisque molestie. Vivamus eu ornare libero. In pretium iaculis nulla id tempor. Mauris sagittis, risus tristique vestibulum lacinia, tortor diam convallis est, ac bibendum leo ex id leo. Nulla facilisi. ");
+                        product.setPrice((float) (Math.round(random.nextFloat(500) * 1000 + 1) / 100.0));
                         product.setRating(Math.round(random.nextFloat() * 50) / 10.0f);
                         product.setSeller(sellerName);
                         product.setType(type);
