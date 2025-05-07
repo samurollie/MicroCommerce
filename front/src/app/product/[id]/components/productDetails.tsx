@@ -2,12 +2,10 @@
 
 import { CatalogueService } from "@/services/product";
 import {
-  Box,
   Breadcrumb,
   Button,
   Card,
   FormatNumber,
-  Heading,
   HStack,
   IconButton,
   NumberInput,
@@ -16,7 +14,6 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
@@ -24,6 +21,9 @@ export default function ProductDetails({ id }: { id: number }) {
   const { products } = CatalogueService();
   const product = products.find((product) => product.id === Number(id));
   const [value, setValue] = useState("0");
+
+  const handleAddToCart = () => {
+  };
 
   if (!product) {
     return <div>Product not found</div>;
@@ -125,7 +125,7 @@ export default function ProductDetails({ id }: { id: number }) {
             </Text>
           </Card.Body>
           <Card.Footer justifyContent="flex-end">
-            <Button colorPalette={"blue"} padding={4}>
+            <Button colorPalette={"blue"} padding={4} onClick={handleAddToCart}>
               Adicionar ao carrinho
             </Button>
           </Card.Footer>

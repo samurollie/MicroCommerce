@@ -33,7 +33,7 @@ public class ProductModel {
 
     @NotNull
     @NotBlank
-    @Length(max = 255)
+    @Lob
     private String description;
 
     @NotNull
