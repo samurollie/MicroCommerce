@@ -1,4 +1,4 @@
-package com.microcommerce.catalogue.models;
+package com.microcommerce.payments.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

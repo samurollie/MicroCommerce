@@ -1,44 +1,51 @@
-import { Product, ProductType } from "@/models/product";
+import { Product } from "@/models/product";
+import { CartStore } from "@/stores/cart";
+import { useCallback, useEffect } from "react";
 
 export const CartService = () => {
-  const getCart = (): Product[] => {
-    return [
-      {
-        id: 1,
-        name: "Product 1",
-        price: 10,
-        quantity: 2,
-        description: "Description for Product 1",
-        image: "image1.jpg",
-        rating: 4.5,
-        type: ProductType.BOOK,
-        seller: "Seller 1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: 2,
-        name: "Product 2",
-        price: 20,
-        quantity: 1,
-        description: "Description for Product 2",
-        image: "image2.jpg",
-        seller: "Seller 2",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        type: ProductType.FOOD,
-        rating: 5,
-      },
-    ];
+  const items = CartStore((state) => state.items);
+  const addItem = CartStore((state) => state.addItem);
+  const subtractItem = CartStore((state) => state.subtractItem);
+  const removeItem = CartStore((state) => state.removeItem);
+  const clearCart = CartStore((state) => state.clearCart);
+  const total = CartStore((state) => state.total);
+
+  const getCart = useCallback(async () => {
+    const productsOnCart = await fetchCart();
+    if (productsOnCart) {
+      productsOnCart.forEach((product) => {
+        addItem(product, product.quantity);
+      });
+    }
+  }, [addItem]);
+
+  const addToCart = useCallback(
+    async (product: Product, quantity: number = 1) => {
+      addItem(product, quantity);
+    },
+    [addItem]
+  );
+
+  const removeFromCart = useCallback(
+    async (productId: number, quantity: number = 1) => {
+      subtractItem(productId, quantity);
+    },
+    [subtractItem]
+  );
+
+  const fetchCart = async (): Promise<Product[]> => {
+    const response = await fetch("http://localhost:8080/api/cart");
+    if (!response.ok) {
+      return [];
+    }
+    return response.json();
   };
 
-  const addToCart = (product: Product) => {
-    console.log("Product added to cart:", product);
-  };
+  useEffect(() => {
+    if (items.length === 0) {
+      getCart();
+    }
+  }, [items.length, getCart]);
 
-  const removeFromCart = (productId) => {
-    console.log("Product removed from cart:", productId);
-  };
-
-  return { getCart, addToCart, removeFromCart };
+  return { items, total, getCart, addToCart, clearCart, removeFromCart };
 };

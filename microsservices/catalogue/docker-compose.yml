@@ -1,6 +1,19 @@
 
 services:
-  postgresdb:
+  catalogue:
+    build: .
+    container_name: catalogue
+    ports:
+      - "8084:8084"
+    env_file: ./.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:$POSTGRESDB_DOCKER_PORT/$POSTGRESDB_DATABASE
+      SPRING_DATASOURCE_USERNAME: $POSTGRESDB_USER
+      SPRING_DATASOURCE_PASSWORD: $POSTGRESDB_ROOT_PASSWORD
+    depends_on:
+      - db
+
+  db:
     image: postgres:15
     container_name: catalogue_db
     restart: unless-stopped
@@ -9,6 +22,7 @@ services:
       - POSTGRES_USER=$POSTGRESDB_USER
       - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
       - POSTGRES_DB=$POSTGRESDB_DATABASE
+      - PGPORT=$POSTGRESDB_DOCKER_PORT
     ports:
       - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
     volumes:

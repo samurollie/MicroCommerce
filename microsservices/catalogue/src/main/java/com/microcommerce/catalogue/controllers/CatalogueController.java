@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/catalogue")
+@CrossOrigin(origins = "*")
 public class CatalogueController {
 
     private final CatalogueService catalogueService;

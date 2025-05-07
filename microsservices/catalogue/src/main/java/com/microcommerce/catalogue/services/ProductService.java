@@ -11,12 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @Transactional
 public class ProductService {
-
-    private final SellerService sellerService;
     private final ProductRepository productRepository;
 
-    public ProductService(SellerService sellerService, ProductRepository productRepository) {
-        this.sellerService = sellerService;
+    public ProductService( ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
@@ -29,10 +26,7 @@ public class ProductService {
         productModel.setQuantity(product.getQuantity());
         productModel.setType(product.getType());
         productModel.setRating(product.getRating());
-
-        var seller = sellerService.getSellerById(product.getSellerId());
-
-        productModel.setSeller(seller);
+        productModel.setSeller(product.getSeller());
         return productRepository.save(productModel);
     }
 

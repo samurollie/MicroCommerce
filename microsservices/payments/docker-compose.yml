@@ -1,0 +1,32 @@
+
+services:
+  payments:
+    build: .
+    container_name: payments
+    ports:
+      - "8081:8081"
+    env_file: ./.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:$POSTGRESDB_DOCKER_PORT/$POSTGRESDB_DATABASE
+      SPRING_DATASOURCE_USERNAME: $POSTGRESDB_USER
+      SPRING_DATASOURCE_PASSWORD: $POSTGRESDB_ROOT_PASSWORD
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: payments_db
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - POSTGRES_USER=$POSTGRESDB_USER
+      - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+      - POSTGRES_DB=$POSTGRESDB_DATABASE
+      - PGPORT=$POSTGRESDB_DOCKER_PORT
+    ports:
+      - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
+    volumes:
+      - db:/var/lib/postgres
+
+volumes:
+  db:
