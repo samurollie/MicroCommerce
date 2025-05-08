@@ -8,9 +8,10 @@ import { UserService } from "@/services/user";
 import { toaster } from "@/components/ui/toaster";
 
 export default function LoginPage() {
-  const pageToRedirect = new URLSearchParams(window.location.search).get(
-    "redirectTo"
-  );
+  const pageToRedirect =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("redirectTo")
+      : null;
   // const redirectTo = pageToRedirect ? `/${pageToRedirect}` : "/";
   const { loginUser } = UserService();
   const router = useRouter();
