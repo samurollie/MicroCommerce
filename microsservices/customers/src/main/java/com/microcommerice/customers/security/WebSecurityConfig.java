@@ -84,10 +84,12 @@ public class WebSecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // seu frontend
-                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-                    config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+                    config.addAllowedOriginPattern("http://localhost:[*]"); // Add your frontend URL here
+                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+                    config.setExposedHeaders(Arrays.asList("Authorization"));
                     config.setAllowCredentials(true);
+                    config.setMaxAge(3600L); // 1 hour cache for preflight requests
                     return config;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
