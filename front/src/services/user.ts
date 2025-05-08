@@ -23,7 +23,7 @@ export const UserService = () => {
     if (!token) {
       console.log("Token não encontrado"); // Debug
       UserStore.getState().clearUser(); // Limpa o usuário se não houver token
-      throw new Error("No token found");
+      // throw new Error("No token found");
     }
 
     try {
