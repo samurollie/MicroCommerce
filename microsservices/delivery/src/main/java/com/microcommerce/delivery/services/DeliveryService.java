@@ -56,4 +56,8 @@ public class DeliveryService {
         int firstDigit = Character.getNumericValue(digitsOnly.charAt(0));
         return 10.0 * (firstDigit + 1); // Arbitrary price based on CEP zones
     }
+
+    public DeliveryModel getDeliveryByOrderId(String orderId) {
+        return deliveryRepository.getDeliveryModelByOrderId(orderId);
+    }
 }

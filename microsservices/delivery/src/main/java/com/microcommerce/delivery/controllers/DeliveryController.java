@@ -5,11 +5,9 @@ import com.microcommerce.delivery.dto.DeliveryPriceDTO;
 import com.microcommerce.delivery.dto.PublicDeliveryDTO;
 import com.microcommerce.delivery.exception.DeliveryAlreadyExistentException;
 import com.microcommerce.delivery.services.DeliveryService;
-import feign.Response;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,4 +45,17 @@ public class DeliveryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(deliveryPriceDTO);
     }
+
+
+    @GetMapping()
+    public ResponseEntity<PublicDeliveryDTO> getDeliveryByOrderId(@RequestParam("orderId") @NotBlank String orderId) {
+        var delivery = deliveryService.getDeliveryByOrderId(orderId);
+        if (delivery == null) {
+            return ResponseEntity.notFound().build();
+        }
+        PublicDeliveryDTO publicDeliveryDTO = modelMapper.map(delivery, PublicDeliveryDTO.class);
+        return ResponseEntity.ok(publicDeliveryDTO);
+    }
+
+
 }
