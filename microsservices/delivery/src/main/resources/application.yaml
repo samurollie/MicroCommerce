@@ -1,0 +1,24 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: delivery
+  datasource:
+    url: jdbc:postgresql://${POSTGRESDB_URL}:${POSTGRESDB_LOCAL_PORT}/${POSTGRESDB_DATABASE}
+    username: ${POSTGRESDB_USER}
+    password: ${POSTGRESDB_ROOT_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+server:
+  port: 8082
+order-service:
+  url: ${ORDER_API_URL}
