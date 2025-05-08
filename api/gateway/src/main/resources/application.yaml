@@ -16,9 +16,9 @@ spring:
       mvc:
         routes:
           - id: payment
-            uri: http://localhost:8081
+            uri: ${PAYMENTS_URL:http://localhost:8081}
             predicates:
-              - Path=/api/payment/**
+              - Path=/api/payments/**
             filters:
               - name: featureEnabled
                 args:

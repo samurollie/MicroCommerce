@@ -12,10 +12,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://gateway_db:5432/gateway_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 1234
+      PAYMENTS_URL: http://payments:8081
       CATALOGUE_URL: http://catalogue:8084
       CUSTOMERS_URL: http://costumers:8086
     depends_on:
       - gateway_db
+      - payments
       - catalogue
       - customers
     networks:
@@ -36,13 +38,44 @@ services:
     networks:
       - microservices-network
 
+  payments:
+    build: microsservices/payments
+    container_name: payments
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://payments_db:5433/payments_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+      ORDER_API_URL: http://orders:8083
+    depends_on:
+      - payments_db
+    networks:
+      - microservices-network
+
+  payments_db:
+    image: postgres:15
+    container_name: payments_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=payments_db
+      - PGPORT=5433
+    ports:
+      - "5433:5433"
+    volumes:
+      - payments_db:/var/lib/postgres
+    networks:
+      - microservices-network
+
   catalogue:
     build: microsservices/catalogue
     container_name: catalogue
     ports:
       - "8084:8084"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://catalogue_db:5433/catalogue_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://catalogue_db:5436/catalogue_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 1234
     depends_on:
@@ -58,9 +91,9 @@ services:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=1234
       - POSTGRES_DB=catalogue_db
-      - PGPORT=5433
+      - PGPORT=5436
     ports:
-      - "5433:5433"
+      - "5436:5436"
     volumes:
       - catalogue_db:/var/lib/postgres
     networks:
@@ -100,3 +133,4 @@ volumes:
   gateway_db:
   catalogue_db:
   costumers_db:
+  payments_db:
