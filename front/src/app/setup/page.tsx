@@ -22,7 +22,7 @@ export default function CataloguePage() {
 
   const onSubmit = (data) => {
     console.log(data);
-  }
+  };
 
   return (
     <VStack align={"center"} gap={8}>
@@ -44,7 +44,7 @@ export default function CataloguePage() {
               <Text>O que deseja vender?</Text>
               <HStack flexWrap={"wrap"}>
                 {Object.values(ProductType).map((type) => (
-                  <Checkbox key={type} value={type}>
+                  <Checkbox key={type} value={type} checked={true}>
                     {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
                   </Checkbox>
                 ))}
@@ -52,16 +52,24 @@ export default function CataloguePage() {
               <Separator />
               <Text>Qual o método de pagamento?</Text>
               <HStack flexWrap={"wrap"}>
-                <Checkbox value="creditCard">Cartão de crédito</Checkbox>
-                <Checkbox value="debitCard">Cartão de débito</Checkbox>
-                <Checkbox value="pix">Pix</Checkbox>
-                <Checkbox value="boleto">Boleto</Checkbox>
+                <Checkbox value="creditCard" checked={true}>
+                  Cartão de crédito
+                </Checkbox>
+                <Checkbox value="debitCard" checked={true}>
+                  Cartão de débito
+                </Checkbox>
+                <Checkbox value="pix" checked={true}>
+                  Pix
+                </Checkbox>
+                <Checkbox value="boleto" checked={true}>
+                  Boleto
+                </Checkbox>
               </HStack>
               <Separator />
               <Text>Quem pode anunciar no seu microcommerce?</Text>
               <Separator />
               <HStack flexWrap={"wrap"} gap={4}>
-                <Checkbox value="anyone">Qualquer um</Checkbox>
+                <Checkbox value="anyone" checked={true}>Qualquer um</Checkbox>
                 <Checkbox value="onlyMe">Somente eu</Checkbox>
               </HStack>
             </VStack>

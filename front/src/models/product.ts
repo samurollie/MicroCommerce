@@ -8,8 +8,6 @@ export type Product = {
   quantity: number;
   rating: number;
   type: ProductType;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 export enum ProductType {
