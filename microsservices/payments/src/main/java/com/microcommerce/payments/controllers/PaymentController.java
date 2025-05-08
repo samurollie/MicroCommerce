@@ -4,13 +4,16 @@ import com.microcommerce.payments.dto.CreatePaymentDTO;
 import com.microcommerce.payments.dto.PublicPaymentDTO;
 import com.microcommerce.payments.exception.PaymentAlreadyExistentException;
 import com.microcommerce.payments.exception.PaymentNotFoundException;
+import com.microcommerce.payments.models.PaymentModel;
 import com.microcommerce.payments.services.PaymentService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -33,6 +36,8 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.CREATED).body(publicPaymentDTO);
         } catch (PaymentAlreadyExistentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 

@@ -48,6 +48,14 @@ public class PaymentModel {
     @Column(name = "approved_at")
     private Date approvedAt;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "credit_card_id", referencedColumnName = "id")
+    private CreditCardInfoModel creditCard;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "debit_card_id", referencedColumnName = "id")
+    private DebitCardInfoModel debitCard;
+
     @PrePersist
     @PreUpdate
     public void onUpdate() {

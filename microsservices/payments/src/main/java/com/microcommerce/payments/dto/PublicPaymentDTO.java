@@ -10,4 +10,6 @@ public class PublicPaymentDTO {
     private float amount;
     private String status;
     private String createdAt;
+    private PublicCardDTO creditCard;
+    private PublicCardDTO debitCard;
 }
