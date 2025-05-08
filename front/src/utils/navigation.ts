@@ -16,25 +16,21 @@ export function getAvailableRoutes(): NavOptionProps[] {
   const protectedRoutes: NavOptionProps[] = [
     //Rotas que só usuários logados tem acesso
     { label: "Carrinho", href: "/cart" },
-    { label: "Minhas Compras", href: "/orders" },
+    { label: "Meus pedidos", href: "/orders" },
   ];
   const AdminRoutes: NavOptionProps[] = [
     //Rotas que só usuários com permissão de admin tem acesso
     { label: "Configurações", href: "/setup" },
   ];
 
-  // Rotas não protegidas são sempre adicionadas
   routes.push(...unprotectedRoutes);
 
-  // Se não houver usuário, retorna apenas rotas não protegidas
   if (!user) {
     return routes;
   }
 
-  // Adiciona rotas protegidas para usuários logados
   routes.push(...protectedRoutes);
 
-  // Verifica se o usuário tem role de admin
   if (
     user.roles &&
     Array.isArray(user.roles) &&
