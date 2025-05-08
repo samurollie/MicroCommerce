@@ -2,38 +2,35 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Button,
-  Card,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Card, Input, Text, VStack } from "@chakra-ui/react";
 import Link from "next/link";
+import { UserService } from "@/services/user";
+import { toaster } from "@/components/ui/toaster";
 
 export default function LoginPage() {
+  const pageToRedirect = new URLSearchParams(window.location.search).get(
+    "redirectTo"
+  );
+  // const redirectTo = pageToRedirect ? `/${pageToRedirect}` : "/";
+  const { loginUser } = UserService();
   const router = useRouter();
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
+      await loginUser(credentials.username, credentials.password).then(() => {
+        router.push(pageToRedirect ?? "/" );
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        document.cookie = `token=${data.token}; path=/`;
-        router.push("/");
-      }
     } catch (error) {
       console.error("Erro ao fazer login:", error);
+      toaster.create({
+        title: "Erro ao fazer login",
+        description: "Verifique suas credenciais e tente novamente",
+        type: "error",
+        duration: 5000,
+      });
     }
   };
 
@@ -41,12 +38,12 @@ export default function LoginPage() {
     <Card.Root maxW="md" mx="auto" mt={8} p="8">
       <form onSubmit={handleLogin}>
         <VStack gap={4} align={"flex-start"}>
-          <Text>Email</Text>
+          <Text>Nome de usuário</Text>
           <Input
-            type="email"
-            value={credentials.email}
+            type="username"
+            value={credentials.username}
             onChange={(e) =>
-              setCredentials((prev) => ({ ...prev, email: e.target.value }))
+              setCredentials((prev) => ({ ...prev, username: e.target.value }))
             }
           />
           <Text>Senha</Text>

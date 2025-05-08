@@ -17,7 +17,7 @@ spring:
 jwt:
     secret: your_jwt_secret_very_secret_and_long_for_security_and_algorithm_HS256
     refreshExpiration: 604800 # in seconds
-    expiration: 3600 # in seconds
+    expiration: 86400000 # in seconds
     issuer: microcommerce-auth
 
 management:
@@ -36,6 +36,6 @@ logging:
 
 server:
     port: 8086
-    servlet:
-        context-path: /api/auth
+    # servlet:
+    #     context-path: /api/auth
 

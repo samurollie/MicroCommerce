@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 // Enables CORS for all origins and marks this class as a REST controller
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

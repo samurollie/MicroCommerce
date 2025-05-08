@@ -3,7 +3,7 @@ import { UserRoles } from "@/models/user";
 import { UserService } from "@/services/user";
 
 export function getAvailableRoutes(): NavOptionProps[] {
-  const { getCurrentUser } = UserService();
+  const { user } = UserService();
   const routes: NavOptionProps[] = [];
 
   const unprotectedRoutes: NavOptionProps[] = [
@@ -23,15 +23,24 @@ export function getAvailableRoutes(): NavOptionProps[] {
     { label: "Configurações", href: "/setup" },
   ];
 
-  const currentUser = getCurrentUser();
-
+  // Rotas não protegidas são sempre adicionadas
   routes.push(...unprotectedRoutes);
 
-  if (currentUser) {
-    routes.push(...protectedRoutes);
-    if (currentUser.roles.includes(UserRoles.ADMIN)) {
-      routes.push(...AdminRoutes);
-    }
+  // Se não houver usuário, retorna apenas rotas não protegidas
+  if (!user) {
+    return routes;
+  }
+
+  // Adiciona rotas protegidas para usuários logados
+  routes.push(...protectedRoutes);
+
+  // Verifica se o usuário tem role de admin
+  if (
+    user.roles &&
+    Array.isArray(user.roles) &&
+    user.roles.includes(UserRoles.ADMIN)
+  ) {
+    routes.push(...AdminRoutes);
   }
 
   return routes;

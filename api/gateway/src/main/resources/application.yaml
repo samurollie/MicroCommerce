@@ -58,7 +58,7 @@ spring:
           - id: auth
             uri: ${CUSTOMERS_URL:http://localhost:8086}
             predicates:
-              - Path=/signup/**, /api/customers/**, /api/service/**
+              - Path=/api/auth/**, /api/customers/**, /api/service/**, /users/**
           - id: recommendation
             uri: http://localhost:8087
             predicates:
