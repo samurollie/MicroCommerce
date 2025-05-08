@@ -13,8 +13,6 @@ import lombok.Setter;
 @Getter @Setter
 @NoArgsConstructor
 public class Address {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,5 +32,5 @@ public class Address {
     private String country;
 
     @NotBlank
-    private boolean isDefault;
+    private boolean defaultAddress;
 }

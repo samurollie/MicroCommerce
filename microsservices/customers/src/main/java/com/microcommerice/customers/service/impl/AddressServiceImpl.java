@@ -44,16 +44,16 @@ public class AddressServiceImpl implements AddressService {
         address.setState(addressDto.getState());
         address.setPostalCode(addressDto.getPostalCode());
         address.setCountry(addressDto.getCountry());
-        address.setDefault(addressDto.isDefault());
+        address.setDefaultAddress(addressDto.isDefault());
 
         // If this address is set as default, unset any existing default address
         if (addressDto.isDefault()) {
-            resetDefaultAddress(user);
+            resetDefaultAddressAddress(user);
         }
 
         // If this is the first address for the user, make it default
         if (addressRepository.findByCustomer(user).isEmpty()) {
-            address.setDefault(true);
+            address.setDefaultAddress(true);
         }
 
         Address savedAddress = addressRepository.save(address);
@@ -75,9 +75,9 @@ public class AddressServiceImpl implements AddressService {
         address.setCountry(addressDto.getCountry());
 
         // Handle default address change
-        if (addressDto.isDefault() && !address.isDefault()) {
-            resetDefaultAddress(user);
-            address.setDefault(true);
+        if (addressDto.isDefault() && !address.isDefaultAddress()) {
+            resetDefaultAddressAddress(user);
+            address.setDefaultAddress(true);
         }
 
         Address updatedAddress = addressRepository.save(address);
@@ -95,11 +95,11 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.delete(address);
 
         // If deleted address was default and user has other addresses, make another one default
-        if (address.isDefault()) {
+        if (address.isDefaultAddress()) {
             List<Address> remainingAddresses = addressRepository.findByCustomer(user);
             if (!remainingAddresses.isEmpty()) {
                 Address newDefault = remainingAddresses.getFirst();
-                newDefault.setDefault(true);
+                newDefault.setDefaultAddress(true);
                 addressRepository.save(newDefault);
             }
         }
@@ -113,16 +113,16 @@ public class AddressServiceImpl implements AddressService {
         Address address = addressRepository.findByIdAndCustomer(addressId, customer)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
 
-        resetDefaultAddress(customer);
-        address.setDefault(true);
+        resetDefaultAddressAddress(customer);
+        address.setDefaultAddress(true);
         addressRepository.save(address);
     }
 
-    private void resetDefaultAddress(Customer user) {
-        Optional<Address> currentDefault = addressRepository.findByCustomerAndDefault(user, true);
+    private void resetDefaultAddressAddress(Customer user) {
+        Optional<Address> currentDefault = addressRepository.findByCustomerAndDefaultAddress(user, true);
         if (currentDefault.isPresent()) {
             Address defaultAddress = currentDefault.get();
-            defaultAddress.setDefault(false);
+            defaultAddress.setDefaultAddress(false);
             addressRepository.save(defaultAddress);
         }
     }
@@ -135,7 +135,7 @@ public class AddressServiceImpl implements AddressService {
         dto.setState(address.getState());
         dto.setPostalCode(address.getPostalCode());
         dto.setCountry(address.getCountry());
-        dto.setDefault(address.isDefault());
+        dto.setDefault(address.isDefaultAddress());
         return dto;
     }
 }
