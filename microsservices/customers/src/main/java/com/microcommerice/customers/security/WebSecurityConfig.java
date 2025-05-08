@@ -101,6 +101,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/auth/**",
                                 "/api/test/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -113,6 +114,7 @@ public class WebSecurityConfig {
                                 "/configuration/security")
                         .permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/users/**", "/addresses/**").authenticated()
                         .requestMatchers("/api/services/**").hasRole("SERVICE")
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
