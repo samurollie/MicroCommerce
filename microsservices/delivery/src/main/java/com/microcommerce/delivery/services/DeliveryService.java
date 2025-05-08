@@ -49,4 +49,11 @@ public class DeliveryService {
         addressModel.setHouseNumber(createAddressDTO.getHouseNumber());
         return addressModel;
     }
+
+    public double getDeliveryPrice(String zipCode) {
+        String digitsOnly = zipCode.replaceAll("\\D", "");
+
+        int firstDigit = Character.getNumericValue(digitsOnly.charAt(0));
+        return 10.0 * (firstDigit + 1); // Arbitrary price based on CEP zones
+    }
 }

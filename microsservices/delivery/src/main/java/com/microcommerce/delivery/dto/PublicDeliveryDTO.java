@@ -8,5 +8,5 @@ public class PublicDeliveryDTO {
     private Long id;
     private String orderId;
     private DeliveryStatus status;
-    // TODO: Add address PublicDTO
+    private PublicAddressDTO address;
 }
