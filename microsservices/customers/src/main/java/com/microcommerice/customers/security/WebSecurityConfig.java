@@ -84,7 +84,9 @@ public class WebSecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.addAllowedOriginPattern("http://localhost:[*]"); // Add your frontend URL here
+                    config.addAllowedOriginPattern("http://localhost:[*]");
+                    config.addAllowedOriginPattern("http://localhost:3000");
+                    config.addAllowedOriginPattern("http://localhost:*");
                     config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
                     config.setExposedHeaders(Arrays.asList("Authorization"));
@@ -100,7 +102,6 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers(
-                                "/api/auth/**",
                                 "/auth/**",
                                 "/api/test/**",
                                 "/swagger-ui.html",
