@@ -1,0 +1,10 @@
+
+services:
+  recommendations:
+    build: .
+    container_name: recommendations
+    ports:
+      - "8082:8082"
+    env_file: ./.env
+    environment:
+      ORDER_API_URL: http://localhost:8083/api/orders
