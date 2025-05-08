@@ -1,7 +1,8 @@
 package com.microcommerce.payments.models;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.microcommerce.payments.enums.PaymentMethod;
 import com.microcommerce.payments.enums.PaymentStatus;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "payments")
@@ -36,9 +38,19 @@ public class PaymentModel {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "payment_date", nullable = false)
-    private Date paymentDate;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Date createdAt;
 
-    @Column(name = "approved_date")
-    private Date approvedDate;
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Column(name = "approved_at")
+    private Date approvedAt;
+
+    @PrePersist
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -20,3 +20,5 @@ spring:
       enabled: true
 server:
   port: 8081
+order-service:
+  url: ${ORDER_API_URL}
