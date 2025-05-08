@@ -3,9 +3,20 @@
 import { Box, HStack, Link } from "@chakra-ui/react";
 import NavOption, { NavOptionProps } from "./navoption";
 import { getAvailableRoutes } from "@/utils/navigation";
+import { UserService } from "@/services/user";
+import { useEffect } from "react";
 
 export default function NavBar() {
+  const { user } = UserService();
   const options: NavOptionProps[] = getAvailableRoutes();
+
+  useEffect(() => {
+    const token = document.cookie
+      .split(";")
+      .find((c) => c.trim().startsWith("token="));
+    console.log("Token no NavBar:", token);
+    console.log("User no NavBar:", user);
+  }, [user]);
 
   return (
     <HStack
