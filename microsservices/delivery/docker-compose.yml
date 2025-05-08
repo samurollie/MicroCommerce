@@ -1,6 +1,6 @@
 
 services:
-  payments:
+  delivery:
     build: .
     container_name: delivery
     ports:
