@@ -1,7 +1,7 @@
 import { Product } from "./product";
 
 export type Order = {
-  id: string;
+  id: number;
   status: OrderStatus;
   customerId: string;
   items: Product[];
