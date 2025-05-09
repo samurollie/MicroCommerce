@@ -12,4 +12,6 @@ public class ProductDTO {
     private float rating;
     private ProductType type = ProductType.OTHER;
     private String seller;
+    private String imageName;
+    private String imageUrl;
 }
