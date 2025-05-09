@@ -7,6 +7,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,8 +43,19 @@ public class DatabaseSeeder {
                         product.setQuantity(random.nextInt(50) + 1);
 
                         // Generate image name
-                        String imageName = "png-transparent-laptop-intel-core-i7-lenovo-ideapad-notebook-miscellaneous-electronics-gadget.png";
-                        product.setImageName(imageName);
+//                        String imageName = "png-transparent-laptop-intel-core-i7-lenovo-ideapad-notebook-miscellaneous-electronics-gadget.png";
+                        String saveDir = "/images/";
+                        String imageFileName = type.name().toLowerCase() + "_" + i + ".jpg";
+                        String savePath = saveDir + imageFileName;
+
+                        downloadAndSaveImage(type, i, productName, savePath);
+
+                        boolean downloaded = downloadAndSaveImage(type, i, productName, savePath);
+                        if (downloaded) {
+                            product.setImageName(imageFileName);
+                        } else {
+                            product.setImageName("png-transparent-laptop-intel-core-i7-lenovo-ideapad-notebook-miscellaneous-electronics-gadget.png");
+                        }
 
                         products.add(product);
                     }
@@ -47,6 +64,29 @@ public class DatabaseSeeder {
                 productRepository.saveAll(products);
             }
         };
+    }
+
+    private boolean downloadAndSaveImage(ProductType type, int index, String productName, String savePath) {
+        try {
+            File directory = new File(savePath).getParentFile();
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            String searchTerm = URLEncoder.encode(type.name().toLowerCase(), StandardCharsets.UTF_8);
+            URL url = new URL("https://loremflickr.com/640/480/" + searchTerm);
+
+            try (InputStream in = url.openStream();
+                 FileOutputStream out = new FileOutputStream(savePath)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                System.out.println("Downloaded image for " + productName + " to " + savePath);
+            }
+        } catch (Exception e) {
+            System.err.println("Error downloading image for " + productName + ": " + e.getMessage());
+        }
     }
 
     private String getSeller(ProductType type) {

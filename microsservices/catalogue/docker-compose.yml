@@ -26,6 +26,7 @@ services:
     ports:
       - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
     volumes:
+      - ./images:/images
       - db:/var/lib/postgres
 
 volumes:
