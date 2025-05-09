@@ -83,9 +83,11 @@ public class DatabaseSeeder {
                     out.write(buffer, 0, bytesRead);
                 }
                 System.out.println("Downloaded image for " + productName + " to " + savePath);
+                return true;
             }
         } catch (Exception e) {
             System.err.println("Error downloading image for " + productName + ": " + e.getMessage());
+            return false;
         }
     }
 
