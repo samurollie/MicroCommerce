@@ -1,24 +1,25 @@
 import { Product } from "./product";
 
 export type Order = {
-  id: string; // UUID
+  id: number;
+  status: OrderStatus;
   customerId: string;
-  // ISO 8601 format
-  status: "PENDING_PAYMENT" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELED" | "FAILED";
-  itemsTotalAmount: number; // Represented as a decimal
-  shippingAmount: number; // Represented as a decimal
-  discountAmount: number; // Represented as a decimal
-  grandTotalAmount: number; // Represented as a decimal
-  items: OrderItem[];
-  shippingAddressId?: string; // Optional
-  paymentTransactionId?: string; // Optional
-  shippingTrackingId?: string; // Optional
+  items: Product[];
 };
 
 export type OrderItem = {
+  id: string;
   productId: string;
-  productNameSnapshot?: string; // Snapshot of the product name
+  name: string;
+  price: number;
   quantity: number;
-  unitPrice: number; // Represented as a decimal
-  subtotal: number; // Represented as a decimal
 };
+
+export enum OrderStatus {
+  PENDING_PAYMENT = "Aguardando pagamento",
+  PROCESSING = "Processando",
+  SHIPPED = "Enviados",
+  DELIVERED = "Entregues",
+  CANCELLED = "Cancelados",
+  FAILED = "Falhados",
+}

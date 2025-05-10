@@ -1,5 +1,6 @@
 package com.microcommerce.catalogue.services;
 
+import com.microcommerce.catalogue.dto.ProductDTO;
 import com.microcommerce.catalogue.models.ProductModel;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class CatalogueService {
         this.productService = productService;
     }
 
-    public List<ProductModel> getFullCatalogue() {
+    public List<ProductDTO> getFullCatalogue() {
         var list = productService.getProducts();
 
         return StreamSupport.stream(list.spliterator(), false)

@@ -28,7 +28,7 @@ public class ProductModel {
 
     @NotNull
     @NotBlank
-    @Length(max = 30)
+    @Length(max = 200)
     private String name;
 
     @NotNull
@@ -54,6 +54,9 @@ public class ProductModel {
     @NotNull
     @Enumerated(EnumType.STRING)
     private ProductType type;
+
+    @NotNull
+    private String imageName;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

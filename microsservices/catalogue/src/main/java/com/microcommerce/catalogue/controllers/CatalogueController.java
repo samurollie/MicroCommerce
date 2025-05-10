@@ -26,7 +26,7 @@ public class CatalogueController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductModel>> getFullCatalogue() {
+    public ResponseEntity<List<ProductDTO>> getFullCatalogue() {
         try {
             var list = catalogueService.getFullCatalogue();
             return ResponseEntity.ok(list);
@@ -38,7 +38,7 @@ public class CatalogueController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductModel> getProductById(@PathVariable long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable long id) {
         try {
             var product = productService.getProductById(id);
             return ResponseEntity.ok(product);

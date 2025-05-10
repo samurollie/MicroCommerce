@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class ProductDTO {
+    private Long id;
     private String name;
     private String description;
     private float price;
@@ -12,4 +13,6 @@ public class ProductDTO {
     private float rating;
     private ProductType type = ProductType.OTHER;
     private String seller;
+    private String imageName;
+    private String imageUrl;
 }

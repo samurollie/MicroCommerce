@@ -1,9 +1,12 @@
 import { NavOptionProps } from "@/components/ui/navoption";
-import { UserRoles } from "@/models/user";
+import { User, UserRoles } from "@/models/user";
 import { UserService } from "@/services/user";
 
 export function getAvailableRoutes(): NavOptionProps[] {
-  const { user } = UserService();
+  // const { user } = UserService();
+  const user = {} as User;
+  user.roles = [UserRoles.ADMIN, UserRoles.SERVICE, UserRoles.USER]; // Simulando um usuário com permissão de admin para teste
+
   const routes: NavOptionProps[] = [];
 
   const unprotectedRoutes: NavOptionProps[] = [

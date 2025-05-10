@@ -84,10 +84,14 @@ public class WebSecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // seu frontend
-                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-                    config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+                    config.addAllowedOriginPattern("http://localhost:[*]");
+                    config.addAllowedOriginPattern("http://localhost:3000");
+                    config.addAllowedOriginPattern("http://localhost:*");
+                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+                    config.setExposedHeaders(Arrays.asList("Authorization"));
                     config.setAllowCredentials(true);
+                    config.setMaxAge(3600L); // 1 hour cache for preflight requests
                     return config;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -98,7 +102,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/auth/**",
                                 "/api/test/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -111,6 +115,7 @@ public class WebSecurityConfig {
                                 "/configuration/security")
                         .permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/users/**", "/addresses/**").authenticated()
                         .requestMatchers("/api/services/**").hasRole("SERVICE")
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
