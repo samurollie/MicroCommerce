@@ -58,7 +58,7 @@ public class DatabaseSeeder {
 
 
                 try {
-                    File placeholderFile = new ClassPathResource("images/" + placeholderImageBase).getFile();
+                    File placeholderFile = new ClassPathResource("static/images/" + placeholderImageBase).getFile();
                     if (!placeholderFile.exists()) {
                         System.err.println("AVISO: Imagem placeholder padrão não encontrada em: images/" + placeholderImageBase +
                                 ". Certifique-se de que 'src/main/resources/static/images/" + placeholderImageBase + "' existe.");
@@ -93,7 +93,7 @@ public class DatabaseSeeder {
 
                         String imageFileNameOnly = safeProductNameForFile + ".jpg";
                         String relativeImagePathForDb = productTypeFolderName + "/" + imageFileNameOnly;
-                        String fullPathInStaticResources = "images/" + relativeImagePathForDb;
+                        String fullPathInStaticResources = "static/images/" + relativeImagePathForDb;
 
                         try {
                             File imageFile = new ClassPathResource(fullPathInStaticResources).getFile();
