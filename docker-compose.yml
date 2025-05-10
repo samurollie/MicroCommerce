@@ -30,7 +30,7 @@ services:
       - catalogue
       # - cart
       - customers
-      - recommendations
+      # - recommendations
     networks:
       - microservices-network
 
