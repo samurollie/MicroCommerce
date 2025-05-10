@@ -23,16 +23,16 @@ spring:
               - name: featureEnabled
                 args:
                   feature: payment
-          - id: shipping
-            uri: http://localhost:8082
+          - id: delivery
+            uri: ${SHIPPING_URL:http://localhost:8082}
             predicates:
-              - Path=/api/shipping/**
+              - Path=/api/delivery/**
             filters:
               - name: featureEnabled
                 args:
-                  feature: shipping
+                  feature: delivery
           - id: orders
-            uri: http://localhost:8083
+            uri: ${ORDERS_URL:http://localhost:8083}
             predicates:
               - Path=/api/orders/**
             filters:
@@ -48,7 +48,7 @@ spring:
                 args:
                   feature: catalogue
           - id: cart
-            uri: http://localhost:8085
+            uri: ${CART_URL:http://localhost:8085}
             predicates:
               - Path=/api/cart/**
             filters:
@@ -60,9 +60,9 @@ spring:
             predicates:
               - Path=/api/auth/**, /api/customers/**, /api/service/**, /users/**
           - id: recommendation
-            uri: http://localhost:8087
+            uri: ${RECOMMENDATION_URL:http://localhost:8087}
             predicates:
-              - Path=/api/recommendation/**
+              - Path=/api/recommendations/**
             filters:
               - name: featureEnabled
                 args:
@@ -70,6 +70,7 @@ spring:
   web:
     resources:
       add-mappings: false
+
 management:
   endpoints:
     web:

@@ -16,13 +16,21 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: 1234
       PAYMENTS_URL: http://payments:8081
+      SHIPPING_URL: http://delivery:8082
+      ORDERS_URL: http://orders:8083
       CATALOGUE_URL: http://catalogue:8084
+      CART_URL: http://cart:8085
       CUSTOMERS_URL: http://customers:8086
+      RECOMMENDATION_URL: http://recommendations:8087
     depends_on:
       - gateway_db
       - payments
+      - delivery
+      - orders
       - catalogue
+      # - cart
       - customers
+      - recommendations
     networks:
       - microservices-network
 
@@ -166,7 +174,36 @@ services:
     networks:
       - microservices-network
 
+  # CART + DB
+  # cart:
+  #   build: microsservices/Cart
+  #   container_name: cart
+  #   ports:
+  #     - "8085:8085"
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://cart_db:5437/cart_db
+  #     SPRING_DATASOURCE_USERNAME: user
+  #     SPRING_DATASOURCE_PASSWORD: 1234
+  #   depends_on:
+  #     - cart_db
+  #   networks:
+  #     - microservices-network
 
+  # cart_db:
+  #   image: postgres:15
+  #   container_name: cart_db
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=user
+  #     - POSTGRES_PASSWORD=1234
+  #     - POSTGRES_DB=cart_db
+  #     - PGPORT=5437
+  #   ports:
+  #     - "5437:5437"
+  #   volumes:
+  #     - cart_db:/var/lib/postgresql/data
+  #   networks:
+  #     - microservices-network
 
   # CUSTOMERS + DB
   customers:
@@ -217,4 +254,4 @@ volumes:
   delivery_db:
   customers_db:
   orders_db:
-  cart_db:
+  # cart_db:
