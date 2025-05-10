@@ -2,12 +2,13 @@ export type Product = {
   id: number;
   name: string;
   description: string;
-  image: string[] | string;
-  seller: string;
   price: number;
   quantity: number;
   rating: number;
   type: ProductType;
+  seller: string;
+  imageName: string;
+  imageUrl: string;
 };
 
 export enum ProductType {
