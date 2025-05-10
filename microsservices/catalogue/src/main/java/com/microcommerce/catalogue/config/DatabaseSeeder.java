@@ -6,19 +6,46 @@ import com.microcommerce.catalogue.repos.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Configuration
 public class DatabaseSeeder {
+
+    // Pattern para remover marcas diacríticas (acentos) após normalização NFD
+    private static final Pattern DIACRITICAL_MARKS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    // Pattern para manter apenas alfanuméricos, underscore e hífen, e substituir espaços por underscore
+    private static final Pattern INVALID_FS_CHARS_PATTERN = Pattern.compile("[^a-zA-Z0-9_\\-]+");
+
+
+    private String normalizeProductNameForFileSystem(String productName) {
+        // 1. Converter para minúsculas
+        String normalized = productName.toLowerCase();
+        // 2. Normalizar para NFD (Canonical Decomposition) para separar acentos dos caracteres base
+        normalized = Normalizer.normalize(normalized, Normalizer.Form.NFD);
+        // 3. Remover as marcas diacríticas (acentos)
+        normalized = DIACRITICAL_MARKS_PATTERN.matcher(normalized).replaceAll("");
+        // 4. Substituir espaços por underscores
+        normalized = normalized.replace(" ", "_");
+        // 5. Remover todos os caracteres que não são letras, números, underscore ou hífen
+        normalized = INVALID_FS_CHARS_PATTERN.matcher(normalized).replaceAll("");
+        // 6. Garantir que não haja underscores duplicados ou no início/fim (opcional, mas bom para limpeza)
+        normalized = normalized.replaceAll("_+", "_"); // Substitui múltiplos underscores por um único
+        if (normalized.startsWith("_")) {
+            normalized = normalized.substring(1);
+        }
+        if (normalized.endsWith("_")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return normalized;
+    }
+
 
     @Bean
     CommandLineRunner initDatabase(ProductRepository productRepository) {
@@ -26,15 +53,31 @@ public class DatabaseSeeder {
             if (productRepository.count() == 0) {
                 List<ProductModel> products = new ArrayList<>();
                 Random random = new Random();
+                String placeholderImageBase = "placeholder.jpg"; // Este é o nome do arquivo
+                String placeholderRelativePath = placeholderImageBase; // Se placeholder.jpg está diretamente em static/images/
+
+
+                try {
+                    File placeholderFile = new ClassPathResource("images/" + placeholderImageBase).getFile();
+                    if (!placeholderFile.exists()) {
+                        System.err.println("AVISO: Imagem placeholder padrão não encontrada em: images/" + placeholderImageBase +
+                                ". Certifique-se de que 'src/main/resources/static/images/" + placeholderImageBase + "' existe.");
+                    }
+                } catch (Exception e) {
+                    System.err.println("AVISO: Não foi possível verificar a imagem placeholder padrão: images/" + placeholderImageBase +
+                            ". Certifique-se de que 'src/main/resources/static/images/" + placeholderImageBase + "' existe. Erro: " + e.getMessage());
+                }
+
 
                 for (ProductType type : ProductType.values()) {
                     List<String> productNames = getProductNames(type);
                     String sellerName = getSeller(type);
+                    String productTypeFolderName = type.name().toLowerCase();
 
                     for (int i = 0; i < productNames.size(); i++) {
                         ProductModel product = new ProductModel();
-                        String productName = productNames.get(i);
-                        product.setName(productName);
+                        String productNameOriginal = productNames.get(i); // Manter o nome original para o produto
+                        product.setName(productNameOriginal);
                         product.setDescription(getDescription(type, i));
                         product.setPrice((float) (Math.round(random.nextFloat(500) * 1000 + 1) / 100.0));
                         product.setRating(Math.round(random.nextFloat() * 40 + 10) / 10.0f);
@@ -42,55 +85,40 @@ public class DatabaseSeeder {
                         product.setType(type);
                         product.setQuantity(random.nextInt(50) + 1);
 
-                        // Generate image name
-//                        String imageName = "png-transparent-laptop-intel-core-i7-lenovo-ideapad-notebook-miscellaneous-electronics-gadget.png";
-                        String saveDir = "/images/";
-                        String imageFileName = type.name().toLowerCase() + "_" + i + ".jpg";
-                        String savePath = saveDir + imageFileName;
-
-                        downloadAndSaveImage(type, i, productName, savePath);
-
-                        boolean downloaded = downloadAndSaveImage(type, i, productName, savePath);
-                        if (downloaded) {
-                            product.setImageName(imageFileName);
-                        } else {
-                            product.setImageName("png-transparent-laptop-intel-core-i7-lenovo-ideapad-notebook-miscellaneous-electronics-gadget.png");
+                        // Normalizar o nome do produto para gerar o nome do arquivo
+                        String safeProductNameForFile = normalizeProductNameForFileSystem(productNameOriginal);
+                        if (safeProductNameForFile.isEmpty()) { // Caso o nome seja só caracteres especiais
+                            safeProductNameForFile = "product_" + i;
                         }
 
+                        String imageFileNameOnly = safeProductNameForFile + ".jpg";
+                        String relativeImagePathForDb = productTypeFolderName + "/" + imageFileNameOnly;
+                        String fullPathInStaticResources = "images/" + relativeImagePathForDb;
+
+                        try {
+                            File imageFile = new ClassPathResource(fullPathInStaticResources).getFile();
+                            if (imageFile.exists() && !imageFile.isDirectory()) {
+                                product.setImageName(relativeImagePathForDb);
+                            } else {
+                                product.setImageName(placeholderRelativePath);
+                                System.err.println("Imagem não encontrada para '" + productNameOriginal + "' (buscando como '" + imageFileNameOnly + "') em '" + fullPathInStaticResources + "'. Usando placeholder.");
+                            }
+                        } catch (Exception e) {
+                            product.setImageName(placeholderRelativePath);
+                            System.err.println("Erro ao verificar imagem para '" + productNameOriginal + "' (buscando como '" + imageFileNameOnly + "') em '" + fullPathInStaticResources + "': " + e.getMessage() + ". Usando placeholder.");
+                        }
                         products.add(product);
                     }
                 }
-
                 productRepository.saveAll(products);
+                System.out.println(products.size() + " produtos foram semeados no banco de dados.");
+            } else {
+                System.out.println("Banco de dados já contém dados. Semeador não executado.");
             }
         };
     }
 
-    private boolean downloadAndSaveImage(ProductType type, int index, String productName, String savePath) {
-        try {
-            File directory = new File(savePath).getParentFile();
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-            String searchTerm = URLEncoder.encode(type.name().toLowerCase(), StandardCharsets.UTF_8);
-            URL url = new URL("https://loremflickr.com/640/480/" + searchTerm);
-
-            try (InputStream in = url.openStream();
-                 FileOutputStream out = new FileOutputStream(savePath)) {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesRead);
-                }
-                System.out.println("Downloaded image for " + productName + " to " + savePath);
-                return true;
-            }
-        } catch (Exception e) {
-            System.err.println("Error downloading image for " + productName + ": " + e.getMessage());
-            return false;
-        }
-    }
-
+    // ... (getSeller, getProductNames, getDescription permanecem os mesmos) ...
     private String getSeller(ProductType type) {
         return switch (type) {
             case FOOD -> "Mercado Fresco";
@@ -190,7 +218,6 @@ public class DatabaseSeeder {
                 case 9 -> "Fábula de George Orwell sobre totalitarismo e revoluções corrompidas.";
                 default -> "Livro best-seller premiado pela crítica.";
             };
-            // Mais cases para outros tipos...
             default -> "Produto de alta qualidade, desenvolvido com os melhores materiais e tecnologia avançada.";
         };
     }
