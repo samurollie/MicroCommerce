@@ -101,17 +101,6 @@ export default function DeliveryList() {
               Endereço de entrega
             </Text>
             <Box w="full">
-              <Text mb={1}>CEP</Text>
-              <Input
-                type="text"
-                maxLength={8}
-                value={cep}
-                onChange={(e) => setCep(e.target.value.replace(/\D/g, ""))}
-                placeholder="00000-000"
-                className="w-full p-2 border rounded"
-              />
-            </Box>
-            <Box w="full">
               <Text mb={1}>Rua</Text>
               <Input type="text" className="w-full p-2 border rounded" />
             </Box>
@@ -143,6 +132,17 @@ export default function DeliveryList() {
                 />
               </Box>
             </HStack>
+            <Box w="full">
+              <Text mb={1}>CEP</Text>
+              <Input
+                type="text"
+                maxLength={8}
+                value={cep}
+                onChange={(e) => setCep(e.target.value.replace(/\D/g, ""))}
+                placeholder="00000-000"
+                className="w-full p-2 border rounded"
+              />
+            </Box>
           </VStack>
           <RadioCard.Root
             defaultValue="next"
@@ -176,7 +176,7 @@ export default function DeliveryList() {
                         <RadioCard.ItemDescription>
                           Entrega até {""}
                           {new Date(
-                            Date.now() + 7000 * 60 * 60 * 24
+                            Date.now() + 7000 * 60 * 60 * 24 * (4 - index)
                           ).toLocaleDateString("pt-BR")}
                         </RadioCard.ItemDescription>
                       </RadioCard.ItemContent>

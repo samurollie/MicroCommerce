@@ -237,15 +237,15 @@ services:
       - microservices-network
 
   # RECOMMENDATIONS (sem DB)
-  recommendations:
-    build: microsservices/recommendations
-    container_name: recommendations
-    environment:
-      CATALOGUE_API_URL: http://catalogue:8084
-    ports:
-      - "8087:8087"
-    networks:
-      - microservices-network
+  # recommendations:
+  #   build: microsservices/recommendations
+  #   container_name: recommendations
+  #   environment:
+  #     CATALOGUE_API_URL: http://catalogue:8084
+  #   ports:
+  #     - "8087:8087"
+  #   networks:
+  #     - microservices-network
 
 volumes:
   gateway_db:

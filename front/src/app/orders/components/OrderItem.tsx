@@ -1,6 +1,6 @@
 import { FormatNumber, HStack, Link, Text, VStack } from "@chakra-ui/react";
 import OrderListItem from "./OrderListItem";
-import { Order, OrderStatus } from "@/models/order";
+import { Order } from "@/models/order";
 import { OrderStatusIndicator } from "./OrderStatusIndicator";
 import { OrderActionButton } from "./OrderActionButton";
 
@@ -21,8 +21,8 @@ export default function OrderItemCard({ order }: { order: Order }) {
         </Link>
         <OrderStatusIndicator status={order.status} />
       </HStack>
-      {order.items.map((item) => (
-        <OrderListItem key={item.id} itemId={Number(item.id)} />
+      {order.items.map((item, index) => (
+        <OrderListItem key={item.id} itemId={Number(item.id)} index={index} />
       ))}
       <HStack w="full" justify={"space-between"}>
         <Text fontSize={"xl"} fontWeight={"bold"}>

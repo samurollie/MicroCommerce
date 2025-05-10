@@ -37,15 +37,15 @@ export const OrderService = () => {
   }, []);
 
   const fetchUpdateOrder = useCallback(
-    async (orderId: number, order: Partial<Order>) => {
+    async (orderId: number, order: OrderStatus) => {
       const response = await fetch(
-        `http://localhost:8080/api/orders/${orderId}`,
+        `http://localhost:8080/api/orders/${orderId}/status`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(order),
+          body: JSON.stringify({ updateStatusDTO: order }),
         }
       );
       if (!response.ok) {
@@ -75,7 +75,7 @@ export const OrderService = () => {
     const orders = await fetchOrders();
     const mappedOrders = orders?.map((order: Order) => ({
       ...order,
-      status: OrderStatus[order.status as unknown as keyof typeof OrderStatus]
+      status: OrderStatus[order.status as unknown as keyof typeof OrderStatus],
     }));
     setOrders(mappedOrders ?? []);
   }, [fetchOrders, setOrders]);
@@ -83,6 +83,8 @@ export const OrderService = () => {
   const createOrder = useCallback(
     async (order: CreateOrderDTO): Promise<Order> => {
       const newOrder = await fetchCreateOrder(order);
+      newOrder.status =
+        OrderStatus[newOrder.status as unknown as keyof typeof OrderStatus];
       addOrder(newOrder);
       return newOrder;
     },
@@ -91,10 +93,10 @@ export const OrderService = () => {
 
   const updateOrder = useCallback(
     async (orderId: number, status: OrderStatus) => {
-      const updatedOrder = await fetchUpdateOrder(orderId, { status });
-      if (updatedOrder) {
+      /* const updatedOrder = await fetchUpdateOrder(orderId, { status });
+      if (updatedOrder) { */
         updateOrderStatus(orderId, status);
-      }
+      // }
     },
     [fetchUpdateOrder, updateOrderStatus]
   );

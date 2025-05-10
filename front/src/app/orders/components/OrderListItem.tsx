@@ -1,12 +1,21 @@
 "use client";
 
+import { OrderService } from "@/services/order";
 import { CatalogueService } from "@/services/product";
 import { Box, HStack, Text, FormatNumber } from "@chakra-ui/react";
 import Image from "next/image";
 
-export default function OrderListItem({ itemId }: { itemId: number }) {
+export default function OrderListItem({
+  itemId,
+  index,
+}: {
+  itemId: number;
+  index: number;
+}) {
   const { getProduct } = CatalogueService();
+  const { getOrder } = OrderService();
   const item = getProduct(itemId);
+  const order = getOrder(itemId);
 
   if (!item) {
     return null;
@@ -37,7 +46,7 @@ export default function OrderListItem({ itemId }: { itemId: number }) {
       </HStack>
       <HStack>
         <Text fontWeight="bold" color="gray.500">
-          {item.quantity}x
+          {order?.items[index].quantity}x
         </Text>
         <Text fontWeight="bold" color="gray.500">
           <FormatNumber value={item.price} style="currency" currency="BRL" />
