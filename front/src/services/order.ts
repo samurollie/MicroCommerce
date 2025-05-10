@@ -73,7 +73,11 @@ export const OrderService = () => {
 
   const getOrders = useCallback(async () => {
     const orders = await fetchOrders();
-    setOrders(orders ?? []);
+    const mappedOrders = orders?.map((order: Order) => ({
+      ...order,
+      status: OrderStatus[order.status as unknown as keyof typeof OrderStatus]
+    }));
+    setOrders(mappedOrders ?? []);
   }, [fetchOrders, setOrders]);
 
   const createOrder = useCallback(

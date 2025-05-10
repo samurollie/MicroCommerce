@@ -12,6 +12,7 @@ import { useEffect } from "react";
 export default function OrdersPage() {
   const { orders, setOrders } = OrderService();
   const categories = Object.values(OrderStatus);
+  console.log(orders);
 
   /* useEffect(() => {
     setOrders([
