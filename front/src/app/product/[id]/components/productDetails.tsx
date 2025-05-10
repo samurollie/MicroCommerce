@@ -4,12 +4,14 @@ import { toaster } from "@/components/ui/toaster";
 import { CartService } from "@/services/cart";
 import { CatalogueService } from "@/services/product";
 import {
+  Box,
   Breadcrumb,
   Button,
   Card,
   FormatNumber,
   HStack,
   IconButton,
+  Input,
   NumberInput,
   RatingGroup,
   Text,
@@ -17,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
 export default function ProductDetails({ id }: { id: number }) {
@@ -25,7 +27,17 @@ export default function ProductDetails({ id }: { id: number }) {
   const { addToCart } = CartService();
   const product = products.find((product) => product.id === Number(id));
   const [quantity, setValue] = useState("0");
+  const [cep, setCep] = useState("");
+  const [deliveryPrice, setDeliveryPrice] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    if (cep.length === 8) {
+      setDeliveryPrice(100);
+    } else {
+      setDeliveryPrice(0);
+    }
+  }, [cep]);
 
   if (!product) {
     return <div>Product not found</div>;
@@ -46,7 +58,7 @@ export default function ProductDetails({ id }: { id: number }) {
         onClick: () => {
           router.push("/cart");
         },
-      }
+      },
     });
   };
 
@@ -101,9 +113,36 @@ export default function ProductDetails({ id }: { id: number }) {
                 currency="BRL"
               />
             </Text>
-            <Text fontSize={"sm"} color="gray.500" mt={2}>
-              Frete grátis para todo o Brasil
-            </Text>
+            <Box>
+              <Text fontSize={"sm"} color="gray.500" mt={2}>
+                Insira seu CEP
+              </Text>
+              <Input
+                id="CEP"
+                value={cep}
+                onChange={(e) => setCep(e.target.value)}
+                placeholder="00000-000"
+              />
+              {deliveryPrice > 0 && (
+                <Text
+                  fontSize={"sm"}
+                  color="green.600"
+                  mt={2}
+                  fontWeight={"bold"}
+                >
+                  Entrega até {""}
+                  {new Date(
+                    Date.now() + 7000 * 60 * 60 * 24
+                  ).toLocaleDateString("pt-BR")}{" "}
+                  por:{" "}
+                  <FormatNumber
+                    value={deliveryPrice}
+                    style="currency"
+                    currency="BRL"
+                  />
+                </Text>
+              )}
+            </Box>
           </Card.Header>
           <Card.Body marginTop={16}>
             <NumberInput.Root
