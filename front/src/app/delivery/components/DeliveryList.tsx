@@ -58,7 +58,7 @@ export default function DeliveryList() {
 
     createOrder(newOrder).then((order) => {
       clearCart();
-      router.push("/checkout?id=" + order.id);
+      router.push("/checkout/" + order.id);
     });
   };
 

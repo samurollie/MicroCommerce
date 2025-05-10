@@ -13,7 +13,7 @@ export default function OrdersPage() {
   const { orders, setOrders } = OrderService();
   const categories = Object.values(OrderStatus);
 
-  useEffect(() => {
+  /* useEffect(() => {
     setOrders([
       {
         id: 1,
@@ -123,8 +123,8 @@ export default function OrdersPage() {
         ],
       },
     ]);
-  }, []);
-  
+  }, []); */
+
   return (
     <>
       <Heading>Meus Pedidos</Heading>
@@ -142,9 +142,19 @@ export default function OrdersPage() {
           </Tabs.List>
           <Tabs.Content value="all" w="full">
             <VStack w="full" align={"flex-start"} gap={4} h="full">
-              {orders.map((order) => (
-                <OrderItemCard key={order.id} order={order} />
-              ))}
+              {orders.length == 0 ? (
+                <VStack align={"center"} justify="center" h="full" w="full">
+                  <EmptyState
+                    mt={16}
+                    title="Não há pedidos nesta categoria"
+                    icon={<LuShoppingCart />}
+                  />
+                </VStack>
+              ) : (
+                orders.map((order) => (
+                  <OrderItemCard key={order.id} order={order} />
+                ))
+              )}
             </VStack>
           </Tabs.Content>
           {categories.map((category) => (

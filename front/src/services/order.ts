@@ -93,8 +93,21 @@ export const OrderService = () => {
     [fetchDeleteOrder, removeOrder]
   );
 
+  const getOrder = useCallback(
+    (orderId: number) => {
+      const order = orders.find((order) => order.id === orderId);
+      if (!order) {
+        console.error(`Order with id ${orderId} not found`);
+        return null;
+      }
+      return order;
+    },
+    [orders]
+  );
+
   return {
     orders,
+    getOrder,
     setOrders,
     createOrder,
     updateOrder,

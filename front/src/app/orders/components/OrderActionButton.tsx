@@ -8,17 +8,13 @@ export const OrderActionButton = ({ order }: { order: Order }) => {
   const { updateOrder } = OrderService();
   const router = useRouter();
 
-  const handleBuyAgain = () => {
-    router.push("/checkout?id=" + order.id);
-  };
-
   switch (order.status) {
     case OrderStatus.PENDING_PAYMENT:
       return (
         <Button
           bgColor={"blue"}
           p={4}
-          onClick={() => router.push("/checkout?id=" + order.id)}
+          onClick={() => router.push("/checkout/" + order.id)}
         >
           Continuar para pagamento
         </Button>
@@ -33,12 +29,6 @@ export const OrderActionButton = ({ order }: { order: Order }) => {
           Confirmar recebimento
         </Button>
       );
-    /*     case OrderStatus.DELIVERED: // Tirar / deixar pra depois
-      return (
-        <Button bgColor={"blue"} p={4} onClick={handleBuyAgain}>
-          Comprar novamente
-        </Button>
-      ); */
     default:
       return null;
   }
