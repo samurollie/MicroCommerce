@@ -18,7 +18,7 @@ export const UserService = () => {
   };
 
   const fetchUser = useCallback(async () => {
-    const token = getToken();
+    /* const token = getToken();
 
     if (!token) {
       console.log("Token não encontrado"); // Debug
@@ -38,18 +38,19 @@ export const UserService = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Erro na resposta:", errorData);
+        console.log("Erro na resposta:", errorData);
         if (response.status === 401) {
           UserStore.getState().clearUser();
         }
-        throw new Error("Failed to fetch user");
+        // throw new Error("Failed to fetch user");
       }
 
       return response.json();
     } catch (error) {
       console.error("Erro na requisição:", error);
       throw error;
-    }
+    } */
+    return null;
   }, []);
 
   const getCurrentUser = useCallback(async () => {

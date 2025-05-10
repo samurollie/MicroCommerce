@@ -4,8 +4,8 @@ export type Order = {
   id: number;
   status: OrderStatus;
   customerId: string;
-  items: Product[];
-  total: number;
+  items: OrderItem[];
+  totalPrice: number;
 };
 
 export type OrderItem = {

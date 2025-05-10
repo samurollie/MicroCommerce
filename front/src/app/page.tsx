@@ -1,5 +1,5 @@
-import { Button, HStack } from "@chakra-ui/react";
+import CataloguePage from "./catalogue/page";
 
 export default function Home() {
-  return <p>Página inicial do MicroCommerce</p>;
+  return <CataloguePage />;
 }

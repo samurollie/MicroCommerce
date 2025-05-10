@@ -1,6 +1,7 @@
+import { CreateOrderDTO } from "@/models/dtos/order";
 import { Order, OrderStatus } from "@/models/order";
 import { OrderStore } from "@/stores/order";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 export const OrderService = () => {
   const orders = OrderStore((state) => state.orders);
@@ -10,7 +11,9 @@ export const OrderService = () => {
   const updateOrderStatus = OrderStore((state) => state.updateOrderStatus);
 
   const fetchOrders = useCallback(async () => {
-    const response = await fetch("/api/orders");
+    const response = await fetch(
+      "http://localhost:8080/api/orders?customerId=1"
+    );
     if (!response.ok) {
       console.error(response);
       return null;
@@ -18,8 +21,8 @@ export const OrderService = () => {
     return response.json();
   }, []);
 
-  const fetchCreateOrder = useCallback(async (order: Order) => {
-    const response = await fetch("/api/orders", {
+  const fetchCreateOrder = useCallback(async (order: CreateOrderDTO) => {
+    const response = await fetch("http://localhost:8080/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,13 +38,16 @@ export const OrderService = () => {
 
   const fetchUpdateOrder = useCallback(
     async (orderId: number, order: Partial<Order>) => {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/orders/${orderId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(order),
+        }
+      );
       if (!response.ok) {
         console.error(response);
         return null;
@@ -52,9 +58,12 @@ export const OrderService = () => {
   );
 
   const fetchDeleteOrder = useCallback(async (orderId: number) => {
-    const response = await fetch(`/api/orders/${orderId}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `http://localhost:8080/api/orders/${orderId}`,
+      {
+        method: "DELETE",
+      }
+    );
     if (!response.ok) {
       console.error(response);
       return null;
@@ -68,20 +77,20 @@ export const OrderService = () => {
   }, [fetchOrders, setOrders]);
 
   const createOrder = useCallback(
-    async (order: Order): Promise<Order> => {
-      // const newOrder = await fetchCreateOrder(order); TO-DO: integrar com o back
-      addOrder(order);
-      return order;
+    async (order: CreateOrderDTO): Promise<Order> => {
+      const newOrder = await fetchCreateOrder(order);
+      addOrder(newOrder);
+      return newOrder;
     },
-    [addOrder]
+    [addOrder, fetchCreateOrder]
   );
 
   const updateOrder = useCallback(
     async (orderId: number, status: OrderStatus) => {
-      // const updatedOrder = await fetchUpdateOrder(orderId, { status }); TO
-      // if (updatedOrder) {
-      updateOrderStatus(orderId, status);
-      // }
+      const updatedOrder = await fetchUpdateOrder(orderId, { status });
+      if (updatedOrder) {
+        updateOrderStatus(orderId, status);
+      }
     },
     [fetchUpdateOrder, updateOrderStatus]
   );
@@ -104,6 +113,12 @@ export const OrderService = () => {
     },
     [orders]
   );
+
+  useEffect(() => {
+    if (orders.length === 0) {
+      getOrders();
+    }
+  }, [getOrders, orders.length]);
 
   return {
     orders,

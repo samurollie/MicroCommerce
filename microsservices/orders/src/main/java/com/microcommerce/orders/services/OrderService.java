@@ -27,7 +27,7 @@ public class OrderService {
         OrderModel orderModel = new OrderModel();
 
         orderModel.setCustomerId(createOrderDTO.getCustomerId());
-        orderModel.setStatus(OrderStatus.WAITING_PAYMENT);
+        orderModel.setStatus(OrderStatus.PENDING_PAYMENT);
         orderModel.setTotalPrice(createOrderDTO.getTotalPrice());
 
         for (CreateOrderItemDTO createOrderItemDTO : createOrderDTO.getOrderItems()) {
@@ -48,7 +48,8 @@ public class OrderService {
     }
 
     public OrderModel updateOrderStatus(UpdateStatusDTO updateStatusDTO, Long orderId) {
-        OrderModel orderModel = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("Order not found"));
+        OrderModel orderModel = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         orderModel.setStatus(updateStatusDTO.getStatus());
 

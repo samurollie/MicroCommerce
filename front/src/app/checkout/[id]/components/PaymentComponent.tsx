@@ -68,7 +68,11 @@ export default function PaymentComponent({ id }: { id: number }) {
         <Box>
           <Text>Total</Text>
           <Text fontSize={"xl"} fontWeight={"bold"}>
-            <FormatNumber value={order.total} style="currency" currency="BRL" />
+            <FormatNumber
+              value={order.totalPrice}
+              style="currency"
+              currency="BRL"
+            />
           </Text>
         </Box>
         <Box w="full">

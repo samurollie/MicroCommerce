@@ -1,6 +1,7 @@
 "use client";
 import CartListItem from "@/app/cart/components/CartListItem";
 import { EmptyState } from "@/components/ui/empty-state";
+import { CreateOrderDTO } from "@/models/dtos/order";
 import { Order, OrderStatus } from "@/models/order";
 import { CartService } from "@/services/cart";
 import { DeliveryService } from "@/services/delivery";
@@ -48,12 +49,15 @@ export default function DeliveryList() {
   }
 
   const handlePayment = () => {
-    const newOrder: Order = {
-      id: 1,
-      items: items,
+    const newOrder: CreateOrderDTO = {
+      orderItems: items.map((item) => ({
+        productId: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
       customerId: "1",
-      status: OrderStatus.PENDING_PAYMENT,
-      total: total + selectedValue,
+      totalPrice: total + selectedValue,
     };
 
     createOrder(newOrder).then((order) => {

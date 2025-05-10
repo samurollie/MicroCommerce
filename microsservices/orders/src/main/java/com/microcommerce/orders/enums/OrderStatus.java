@@ -1,10 +1,10 @@
 package com.microcommerce.orders.enums;
 
 public enum OrderStatus {
-    WAITING_PAYMENT,
-    PREPARING,
+    PENDING_PAYMENT,
+    PROCESSING,
+    SHIPPED,
     DELIVERED,
     CANCELLED,
-    CLOSED,
-    REFUNDED,
+    FAILED,
 }
