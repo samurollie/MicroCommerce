@@ -12,7 +12,13 @@ import {
 import Image from "next/image";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
-export default function CartListItem({ item }: { item: Product }) {
+export default function CartListItem({
+  item,
+  showNumberInput = true,
+}: {
+  item: Product;
+  showNumberInput?: boolean;
+}) {
   const { getProduct, addProduct, removeProducts } = CatalogueService();
   const { addToCart, removeFromCart } = CartService();
   const maxQuantity = getProduct(item.id)?.quantity || 0;
@@ -50,33 +56,36 @@ export default function CartListItem({ item }: { item: Product }) {
         </Box>
       </HStack>
       <HStack>
-        <NumberInput.Root
-          value={item.quantity.toString()}
-          onValueChange={(e) => updateItem(e.valueAsNumber)}
-          unstyled
-          spinOnPress={false}
-          max={maxQuantity}
-          min={0}
-          step={1}
-        >
-          <HStack gap="2">
-            <NumberInput.DecrementTrigger asChild>
-              <IconButton variant="outline" size="sm">
-                <LuMinus />
-              </IconButton>
-            </NumberInput.DecrementTrigger>
-            <NumberInput.ValueText
-              textAlign="center"
-              fontSize="lg"
-              minW="3ch"
-            />
-            <NumberInput.IncrementTrigger asChild>
-              <IconButton variant="outline" size="sm">
-                <LuPlus />
-              </IconButton>
-            </NumberInput.IncrementTrigger>
-          </HStack>
-        </NumberInput.Root>
+        {showNumberInput && (
+          <NumberInput.Root
+            value={item.quantity.toString()}
+            onValueChange={(e) => updateItem(e.valueAsNumber)}
+            unstyled
+            spinOnPress={false}
+            max={maxQuantity}
+            min={0}
+            step={1}
+          >
+            <HStack gap="2">
+              <NumberInput.DecrementTrigger asChild>
+                <IconButton variant="outline" size="sm">
+                  <LuMinus />
+                </IconButton>
+              </NumberInput.DecrementTrigger>
+              <NumberInput.ValueText
+                textAlign="center"
+                fontSize="lg"
+                minW="3ch"
+              />
+              <NumberInput.IncrementTrigger asChild>
+                <IconButton variant="outline" size="sm">
+                  <LuPlus />
+                </IconButton>
+              </NumberInput.IncrementTrigger>
+            </HStack>
+          </NumberInput.Root>
+        )}
+
         <Text fontWeight="bold" color="gray.500">
           {item.quantity}x
         </Text>

@@ -68,18 +68,19 @@ export const OrderService = () => {
   }, [fetchOrders, setOrders]);
 
   const createOrder = useCallback(
-    async (order: Order) => {
-      const newOrder = await fetchCreateOrder(order);
-      addOrder(newOrder);
+    async (order: Order): Promise<Order> => {
+      // const newOrder = await fetchCreateOrder(order); TO-DO: integrar com o back
+      addOrder(order);
+      return order;
     },
-    [addOrder, fetchCreateOrder]
+    [addOrder]
   );
 
   const updateOrder = useCallback(
     async (orderId: number, status: OrderStatus) => {
       // const updatedOrder = await fetchUpdateOrder(orderId, { status }); TO
       // if (updatedOrder) {
-        updateOrderStatus(orderId, status);
+      updateOrderStatus(orderId, status);
       // }
     },
     [fetchUpdateOrder, updateOrderStatus]
@@ -92,5 +93,12 @@ export const OrderService = () => {
     [fetchDeleteOrder, removeOrder]
   );
 
-  return { orders, setOrders, createOrder, updateOrder, deleteOrder, getOrders };
+  return {
+    orders,
+    setOrders,
+    createOrder,
+    updateOrder,
+    deleteOrder,
+    getOrders,
+  };
 };

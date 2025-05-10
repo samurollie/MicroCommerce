@@ -5,6 +5,7 @@ export type Order = {
   status: OrderStatus;
   customerId: string;
   items: Product[];
+  total: number;
 };
 
 export type OrderItem = {

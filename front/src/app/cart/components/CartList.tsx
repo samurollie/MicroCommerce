@@ -13,10 +13,12 @@ import {
 import { LuShoppingCart } from "react-icons/lu";
 import CartListItem from "./CartListItem";
 import { CatalogueService } from "@/services/product";
+import { useRouter } from "next/navigation";
 
 export default function CartList() {
   const { items, total, clearCart } = CartService();
   const { addProduct } = CatalogueService();
+  const router = useRouter();
 
   if (items.length === 0) {
     return (
@@ -59,9 +61,9 @@ export default function CartList() {
             <FormatNumber value={total} style="currency" currency="BRL" />
           </Text>
         </Box>
-        <Box>
-          <Button w="full" p="4" bgColor={"#2c2d97"}>
-            Continuar para pagamento
+        <Box w="full">
+          <Button w="full" p="4" bgColor={"#2c2d97"} onClick={() => router.push("/delivery")}>
+            Continuar para entrega
           </Button>
           <Button
             w="full"
