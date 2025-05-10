@@ -1,0 +1,45 @@
+"use client";
+import { Order, OrderStatus } from "@/models/order";
+import { OrderService } from "@/services/order";
+import { Button } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
+
+export const OrderActionButton = ({ order }: { order: Order }) => {
+  const { updateOrder } = OrderService();
+  const router = useRouter();
+
+  const handleBuyAgain = () => {
+    router.push("/checkout?id=" + order.id);
+  };
+
+  switch (order.status) {
+    case OrderStatus.PENDING_PAYMENT:
+      return (
+        <Button
+          bgColor={"blue"}
+          p={4}
+          onClick={() => router.push("/checkout?id=" + order.id)}
+        >
+          Continuar para pagamento
+        </Button>
+      );
+    case OrderStatus.SHIPPED:
+      return (
+        <Button
+          bgColor={"blue"}
+          p={4}
+          onClick={() => updateOrder(order.id, OrderStatus.DELIVERED)}
+        >
+          Confirmar recebimento
+        </Button>
+      );
+    /*     case OrderStatus.DELIVERED: // Tirar / deixar pra depois
+      return (
+        <Button bgColor={"blue"} p={4} onClick={handleBuyAgain}>
+          Comprar novamente
+        </Button>
+      ); */
+    default:
+      return null;
+  }
+};

@@ -18,8 +18,8 @@ export type OrderItem = {
 export enum OrderStatus {
   PENDING_PAYMENT = "Aguardando pagamento",
   PROCESSING = "Processando",
-  SHIPPED = "Enviados",
-  DELIVERED = "Entregues",
-  CANCELLED = "Cancelados",
-  FAILED = "Falhados",
+  SHIPPED = "A caminho",
+  DELIVERED = "Entregue",
+  CANCELLED = "Cancelado",
+  FAILED = "Devolução",
 }

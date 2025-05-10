@@ -77,10 +77,10 @@ export const OrderService = () => {
 
   const updateOrder = useCallback(
     async (orderId: number, status: OrderStatus) => {
-      const updatedOrder = await fetchUpdateOrder(orderId, { status });
-      if (updatedOrder) {
-        updateOrderStatus(orderId, updatedOrder.status);
-      }
+      // const updatedOrder = await fetchUpdateOrder(orderId, { status }); TO
+      // if (updatedOrder) {
+        updateOrderStatus(orderId, status);
+      // }
     },
     [fetchUpdateOrder, updateOrderStatus]
   );
@@ -92,5 +92,5 @@ export const OrderService = () => {
     [fetchDeleteOrder, removeOrder]
   );
 
-  return { orders, createOrder, updateOrder, deleteOrder, getOrders };
+  return { orders, setOrders, createOrder, updateOrder, deleteOrder, getOrders };
 };

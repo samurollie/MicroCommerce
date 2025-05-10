@@ -51,6 +51,7 @@ public class ProductService {
 
     private ProductDTO toDTO(ProductModel entity) {
         ProductDTO dto = new ProductDTO();
+        dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
         dto.setPrice(entity.getPrice());

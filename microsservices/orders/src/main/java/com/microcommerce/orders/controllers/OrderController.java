@@ -1,11 +1,10 @@
 package com.microcommerce.orders.controllers;
 
 import com.microcommerce.orders.dto.CreateOrderDTO;
+import com.microcommerce.orders.dto.UpdateStatusDTO;
 import com.microcommerce.orders.models.OrderModel;
 import com.microcommerce.orders.services.OrderService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -33,6 +32,14 @@ public class OrderController {
     public ResponseEntity<List<OrderModel>> listOrdersByUserId(@RequestParam("customerId") Long customerId) {
         List<OrderModel> orders = orderService.findByUserId(customerId);
         return ResponseEntity.ok(orders);
+    }
+
+    @PutMapping("/{order_id}/status")
+    public ResponseEntity<OrderModel> updateStatus(@RequestBody @Valid UpdateStatusDTO updateStatusDTO,
+                                                   @PathVariable("order_id") Long orderId) {
+        OrderModel orderModel = orderService.updateOrderStatus(updateStatusDTO, orderId);
+
+        return ResponseEntity.ok(orderModel);
     }
 
 }
