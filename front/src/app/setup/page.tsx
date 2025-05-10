@@ -1,8 +1,9 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { PaymentMethod } from "@/models/paymentMethod";
 import { ProductType } from "@/models/product";
-
+import { SetupService } from "@/services/setup";
 import {
   Button,
   Card,
@@ -15,13 +16,32 @@ import {
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
-export default function CataloguePage() {
+export default function SetupPage() {
   const router = useRouter();
+  const { productType, paymentMethod, setProductType, setPaymentMethod } =
+    SetupService();
 
-  const { handleSubmit } = useForm();
+  const { handleSubmit, register, setValue } = useForm({
+    defaultValues: {
+      productTypes: productType,
+      paymentMethods: paymentMethod,
+    },
+  });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = (data: {
+    productTypes: ProductType[];
+    paymentMethods: PaymentMethod[];
+  }) => {
+    console.log("Form data:", data);
+    // Garantir que estamos passando um array válido de ProductType
+    const selectedTypes = data.productTypes.filter((type) =>
+      Object.values(ProductType).includes(type as ProductType)
+    ) as ProductType[];
+
+    console.log("Filtered types:", selectedTypes);
+    setProductType(selectedTypes);
+    setPaymentMethod(data.paymentMethods as PaymentMethod[]);
+    router.push("/catalogue");
   };
 
   return (
@@ -36,41 +56,50 @@ export default function CataloguePage() {
             adicionar ou remover features a qualquer momento.
           </Text>
         </Card.Header>
-        <form onSubmit={handleSubmit((data) => console.log(data))}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Card.Body>
             <VStack align={"flex-start"} gap={4}>
               <Text fontWeight={"bold"}>Features disponíveis:</Text>
               <Separator />
               <Text>O que deseja vender?</Text>
               <HStack flexWrap={"wrap"}>
-                {Object.values(ProductType).map((type) => (
-                  <Checkbox key={type} value={type} checked={true}>
-                    {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
-                  </Checkbox>
-                ))}
+                {Object.values(ProductType).map((type) => {
+                  console.log(
+                    `Checkbox for type ${type}, defaultChecked=${productType.includes(
+                      type
+                    )}`
+                  );
+                  return (
+                    <Checkbox
+                      key={type}
+                      {...register("productTypes")}
+                      value={type}
+                      defaultChecked
+                    >
+                      {type}
+                    </Checkbox>
+                  );
+                })}
               </HStack>
               <Separator />
               <Text>Qual o método de pagamento?</Text>
               <HStack flexWrap={"wrap"}>
-                <Checkbox value="creditCard" checked={true}>
-                  Cartão de crédito
-                </Checkbox>
-                <Checkbox value="debitCard" checked={true}>
-                  Cartão de débito
-                </Checkbox>
-                <Checkbox value="pix" checked={true}>
-                  Pix
-                </Checkbox>
-                <Checkbox value="boleto" checked={true}>
-                  Boleto
-                </Checkbox>
-              </HStack>
-              <Separator />
-              <Text>Quem pode anunciar no seu microcommerce?</Text>
-              <Separator />
-              <HStack flexWrap={"wrap"} gap={4}>
-                <Checkbox value="anyone" checked={true}>Qualquer um</Checkbox>
-                <Checkbox value="onlyMe">Somente eu</Checkbox>
+                {Object.values(PaymentMethod).map((method) => (
+                  <Checkbox
+                    key={method}
+                    {...register("paymentMethods")}
+                    value={method}
+                    defaultChecked={paymentMethod.includes(method)}
+                  >
+                    {method === PaymentMethod.CREDIT_CARD
+                      ? "Cartão de crédito"
+                      : method === PaymentMethod.DEBIT_CARD
+                      ? "Cartão de débito"
+                      : method === PaymentMethod.PIX
+                      ? "Pix"
+                      : "Boleto"}
+                  </Checkbox>
+                ))}
               </HStack>
             </VStack>
           </Card.Body>

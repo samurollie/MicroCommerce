@@ -10,7 +10,7 @@ export type SetupStore = {
 };
 
 export const SetupStore = create<SetupStore>((set) => ({
-  productType: Object.keys(ProductType) as ProductType[],
+  productType: Object.values(ProductType),
   paymentMethod: Object.values(PaymentMethod),
   setProductType: (productType) => set({ productType }),
   setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
