@@ -2,7 +2,9 @@
 
 import { toaster } from "@/components/ui/toaster";
 import { Order, OrderStatus } from "@/models/order";
+import { PaymentMethod } from "@/models/paymentMethod";
 import { OrderService } from "@/services/order";
+import { SetupService } from "@/services/setup";
 import {
   VStack,
   Box,
@@ -18,6 +20,7 @@ import { useState, useEffect } from "react";
 export default function PaymentComponent({ id }: { id: number }) {
   const { updateOrder, getOrder } = OrderService();
   const [order, setOrder] = useState<Order | null>(null);
+  const { paymentMethod: availableMethods } = SetupService();
   const [paymentMethod, setPaymentMethod] = useState("");
   const router = useRouter();
 
@@ -82,13 +85,22 @@ export default function PaymentComponent({ id }: { id: number }) {
             value={paymentMethod}
           >
             <option value="">Selecione uma forma de pagamento</option>
-            <option value="pix">PIX</option>
-            <option value="boleto">Boleto</option>
-            <option value="credit">Cartão de Crédito</option>
-            <option value="debit">Cartão de Débito</option>
+            {availableMethods.map((method) => (
+              <option key={method} value={method}>
+                {method === PaymentMethod.PIX
+                  ? "PIX"
+                  : method === PaymentMethod.BOLETO
+                  ? "Boleto"
+                  : method === PaymentMethod.CREDIT_CARD
+                  ? "Cartão de Crédito"
+                  : method === PaymentMethod.DEBIT_CARD
+                  ? "Cartão de Débito"
+                  : ""}
+              </option>
+            ))}
           </select>
 
-          {paymentMethod === "pix" && (
+          {paymentMethod === PaymentMethod.PIX && (
             <VStack p={4} borderWidth={1} borderRadius="md">
               <Text>Código PIX</Text>
               <Text fontSize="sm" fontFamily="monospace">
@@ -97,7 +109,7 @@ export default function PaymentComponent({ id }: { id: number }) {
             </VStack>
           )}
 
-          {paymentMethod === "boleto" && (
+          {paymentMethod === PaymentMethod.BOLETO && (
             <VStack p={4} borderWidth={1} borderRadius="md">
               <Text>Código do Boleto</Text>
               <Text fontSize="sm" fontFamily="monospace">
@@ -106,7 +118,8 @@ export default function PaymentComponent({ id }: { id: number }) {
             </VStack>
           )}
 
-          {(paymentMethod === "credit" || paymentMethod === "debit") && (
+          {(paymentMethod === PaymentMethod.CREDIT_CARD ||
+            paymentMethod === PaymentMethod.DEBIT_CARD) && (
             <VStack gap={4}>
               <Input placeholder="Número do cartão" />
               <HStack w="full">
