@@ -13,6 +13,8 @@ export default function ProductCard({ product }: { product: Product }) {
       borderRadius="md"
       _hover={{ cursor: "pointer" }}
       onClick={() => router.push(`/product/${product.id}`)}
+      maxW={"223px"}
+      textOverflow={"wrap"}
     >
       <Image
         src="https://placehold.co/215x215/png"

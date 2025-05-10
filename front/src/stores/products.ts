@@ -3,7 +3,9 @@ import { create } from "zustand";
 
 export type ProductStore = {
   products: Product[];
+  recommendations: Product[];
   setProducts: (products: Product[]) => void;
+  setRecommendations: (products: Product[]) => void;
   removeProduct: (productId: number, quantity: number) => void;
   addProducts: (product: Product, quantity?: number) => void;
   updateProduct: (productId: number, updatedProduct: Product) => void;
@@ -11,7 +13,9 @@ export type ProductStore = {
 
 export const ProductStore = create<ProductStore>()((set) => ({
   products: [],
+  recommendations: [],
   setProducts: (products: Product[]) => set({ products: products }),
+  setRecommendations: (products: Product[]) => set({ recommendations: products }),
   removeProduct: (productId: number, quantity: number = 1) =>
     set((state) => {
       const product = state.products.find((p) => p.id === productId);
