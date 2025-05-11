@@ -1,8 +1,8 @@
 spring:
     application:
-        name: customer-service
+        name: customers-service
     datasource:
-        url: jdbc:mysql://localhost:3306/customer_db
+        url: jdbc:postgresql://localhost:5438/customer_db
         username: postgres
         password: password
     jpa:
@@ -17,8 +17,25 @@ spring:
 jwt:
     secret: your_jwt_secret_very_secret_and_long_for_security_and_algorithm_HS256
     refreshExpiration: 604800 # in seconds
-    expiration: 3600 # in seconds
+    expiration: 86400000 # in seconds
+    issuer: microcommerce-auth
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: "*"
+    endpoint:
+        health:
+            show-details: always
+
+logging:
+    level:
+        com.microcommerce.customers: DEBUG
+        org.springframework.security: DEBUG
 
 server:
-    port: 8081
+    port: 8086
+    # servlet:
+    #     context-path: /api/auth
 

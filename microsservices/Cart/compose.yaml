@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=cart_db'
+      - 'POSTGRES_PASSWORD=cart'
+      - 'POSTGRES_USER=cart'
+    ports:
+      - '5432'

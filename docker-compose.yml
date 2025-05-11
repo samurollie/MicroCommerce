@@ -1,0 +1,257 @@
+version: "3.8"
+
+networks:
+  microservices-network:
+    driver: bridge
+
+services:
+  # GATEWAY + DB
+  gateway:
+    build: api/gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://gateway_db:5432/gateway_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+      PAYMENTS_URL: http://payments:8081
+      SHIPPING_URL: http://delivery:8082
+      ORDERS_URL: http://orders:8083
+      CATALOGUE_URL: http://catalogue:8084
+      CART_URL: http://cart:8085
+      CUSTOMERS_URL: http://customers:8086
+      RECOMMENDATION_URL: http://recommendations:8087
+    depends_on:
+      - gateway_db
+      - payments
+      - delivery
+      - orders
+      - catalogue
+      # - cart
+      - customers
+      # - recommendations
+    networks:
+      - microservices-network
+
+  gateway_db:
+    image: postgres:15
+    container_name: gateway_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=gateway_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - gateway_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # PAYMENTS + DB
+  payments:
+    build: microsservices/payments
+    container_name: payments
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://payments_db:5433/payments_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+      ORDER_API_URL: http://orders:8083
+    depends_on:
+      - payments_db
+    networks:
+      - microservices-network
+
+  payments_db:
+    image: postgres:15
+    container_name: payments_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=payments_db
+      - PGPORT=5433
+    ports:
+      - "5433:5433"
+    volumes:
+      - payments_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # DELIVERY + DB
+  delivery:
+    build: microsservices/delivery
+    container_name: delivery
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://delivery_db:5434/delivery_db
+      SPRING_DATASOURCE_USERNAME: micro
+      SPRING_DATASOURCE_PASSWORD: commerce
+    depends_on:
+      - delivery_db
+    networks:
+      - microservices-network
+
+  delivery_db:
+    image: postgres:16
+    container_name: delivery_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: delivery_db
+      POSTGRES_USER: micro
+      POSTGRES_PASSWORD: commerce
+      PGPORT: 5434
+    ports:
+      - "5434:5434"
+    volumes:
+      - delivery_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # ORDERS + DB
+  orders:
+    build: microsservices/orders
+    container_name: orders
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://orders_db:5435/orders_db
+      SPRING_DATASOURCE_USERNAME: micro
+      SPRING_DATASOURCE_PASSWORD: commerce
+    depends_on:
+      - orders_db
+    networks:
+      - microservices-network
+
+  orders_db:
+    image: postgres:16
+    container_name: orders_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: micro
+      POSTGRES_PASSWORD: commerce
+      PGPORT: 5435
+    ports:
+      - "5435:5435"
+    volumes:
+      - orders_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # CATALOGUE + DB
+  catalogue:
+    build: microsservices/catalogue
+    container_name: catalogue
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://catalogue_db:5436/catalogue_db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - catalogue_db
+    networks:
+      - microservices-network
+
+  catalogue_db:
+    image: postgres:15
+    container_name: catalogue_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=catalogue_db
+      - PGPORT=5436
+    ports:
+      - "5436:5436"
+    volumes:
+      - catalogue_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # CART + DB
+  # cart:
+  #   build: microsservices/Cart
+  #   container_name: cart
+  #   ports:
+  #     - "8085:8085"
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://cart_db:5437/cart_db
+  #     SPRING_DATASOURCE_USERNAME: user
+  #     SPRING_DATASOURCE_PASSWORD: 1234
+  #   depends_on:
+  #     - cart_db
+  #   networks:
+  #     - microservices-network
+
+  # cart_db:
+  #   image: postgres:15
+  #   container_name: cart_db
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=user
+  #     - POSTGRES_PASSWORD=1234
+  #     - POSTGRES_DB=cart_db
+  #     - PGPORT=5437
+  #   ports:
+  #     - "5437:5437"
+  #   volumes:
+  #     - cart_db:/var/lib/postgresql/data
+  #   networks:
+  #     - microservices-network
+
+  # CUSTOMERS + DB
+  customers:
+    build: microsservices/customers
+    container_name: customers
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://customers_db:5438/customer_db
+      SPRING_DATASOURCE_USERNAME: micro
+      SPRING_DATASOURCE_PASSWORD: commerce
+    depends_on:
+      - customers_db
+    networks:
+      - microservices-network
+
+  customers_db:
+    image: postgres:16
+    container_name: customers_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: micro
+      POSTGRES_PASSWORD: commerce
+      PGPORT: 5438
+    ports:
+      - "5438:5438"
+    volumes:
+      - customers_db:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # RECOMMENDATIONS (sem DB)
+  # recommendations:
+  #   build: microsservices/recommendations
+  #   container_name: recommendations
+  #   environment:
+  #     CATALOGUE_API_URL: http://catalogue:8084
+  #   ports:
+  #     - "8087:8087"
+  #   networks:
+  #     - microservices-network
+
+volumes:
+  gateway_db:
+  catalogue_db:
+  payments_db:
+  delivery_db:
+  customers_db:
+  orders_db:
+  # cart_db:

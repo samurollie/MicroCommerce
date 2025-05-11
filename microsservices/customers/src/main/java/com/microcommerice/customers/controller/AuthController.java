@@ -3,6 +3,7 @@ package com.microcommerice.customers.controller;
 import com.microcommerice.customers.dto.request.LoginRequest;
 import com.microcommerice.customers.dto.request.SignupRequest;
 import com.microcommerice.customers.dto.response.JwtResponse;
+import com.microcommerice.customers.dto.response.MessageResponse;
 import com.microcommerice.customers.entity.Customer;
 import com.microcommerice.customers.entity.Role;
 import com.microcommerice.customers.repository.CustomerRepository;
@@ -10,6 +11,7 @@ import com.microcommerice.customers.repository.RoleRepository;
 import com.microcommerice.customers.security.jwt.JwtUtils;
 import com.microcommerice.customers.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,107 +24,85 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // Enables CORS for all origins and marks this class as a REST controller
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    AuthenticationManager authenticationManager;
-    CustomerRepository customerRepository;
-    RoleRepository roleRepository;
-    PasswordEncoder passwordEncoder;
-    JwtUtils jwtUtils;
-
-    public AuthController(AuthenticationManager authenticationManager,
-                        CustomerRepository customerRepository,
-                        RoleRepository roleRepository,
-                        PasswordEncoder passwordEncoder,
-                        JwtUtils jwtUtils) {
-        this.authenticationManager = authenticationManager;
-        this.customerRepository = customerRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtils = jwtUtils;
-    }
+    private final AuthenticationManager authenticationManager;
+    private final CustomerRepository customerRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder encoder;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        ); // authenticate the user with the provided username and password
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication); // set the authentication in the security context
-        String jwt = jwtUtils.generateJwtToken(authentication); // generate a JWT token for the authenticated user
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(
                 jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles
-        )); // return the JWT token and user details in the response
+                roles));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
-        if (customerRepository.existsByUsername(signupRequest.getUsername())) {
-            return ResponseEntity.badRequest().body("Error: Username is already taken!");
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (customerRepository.existsByUsername(signUpRequest.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        if (customerRepository.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.badRequest().body("Error: Email is already in use!");
+        if (customerRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
         }
 
-       Customer customer = new Customer(
-               signupRequest.getUsername(),
-               signupRequest.getEmail(),
-               passwordEncoder.encode(signupRequest.getPassword()),
-               signupRequest.getName()
-       );
+        // Create new customer's account
+        Customer customer = new Customer();
+        customer.setUsername(signUpRequest.getUsername());
+        customer.setEmail(signUpRequest.getEmail());
+        customer.setPassword(encoder.encode(signUpRequest.getPassword()));
+        customer.setFirstName(signUpRequest.getFirstName());
+        customer.setLastName(signUpRequest.getLastName());
 
-        if (signupRequest.getPhone() != null) {
-            customer.setPhone(signupRequest.getPhone());
-        }
-
-        Set<String> strRoles = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role not found"));
-            roles.add(userRole);
-        }  else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(Role.ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-                        break;
-                    case "service":
-                        Role serviceRole = roleRepository.findByName(Role.ERole.ROLE_SERVICE)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(serviceRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
+        // By default, assign ROLE_USER
+        Role customerRole = roleRepository.findByName(Role.ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(customerRole);
+
+        // Check if admin role is requested and add it if so
+        if (signUpRequest.getRoles() != null) {
+            signUpRequest.getRoles().forEach(role -> {
+                if ("admin".equals(role)) {
+                    Role adminRole = roleRepository.findByName(Role.ERole.ROLE_ADMIN)
+                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(adminRole);
                 }
             });
         }
 
-        customer.setRoles(roles); // set the roles for the new customer
-        customerRepository.save(customer); // save the new customer to the database
+        customer.setRoles(roles);
+        customerRepository.save(customer);
 
-        return ResponseEntity.ok("User registered successfully!"); // return success message
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
